@@ -39,3 +39,5 @@ Klyro prioritizes user privacy inherently through its architectural design:
 <p align="center" style="margin-top:60px; font-size: 18px;">
 Built with ❤️ by <a style="color: white !important; text-decoration: none !important;"href="https://ayush-devspace5.web.app">Ayush Devspace</a>.
 </p>
+
+- **Note:** It is under development
