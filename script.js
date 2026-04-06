@@ -1,9 +1,10 @@
-const MY_API_KEY = "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";
+const MY_API_KEY = "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";
 const AI_NAME = "Klyro"; // Change this variable to rename your AI everywhere
 
 // ─────────────────────────────────────────────────────────────
 
 let history = [];
+let attachedFiles = [];
 let isLoading = false;
 let abortController = null;
 let currentChatId = Date.now().toString();
@@ -204,6 +205,8 @@ function showToast(msg, isError = false, d = 3000) {
 }
 
 const FALLBACK_MODELS = [
+  'google/gemini-2.0-pro-exp-02-05:free',
+  'google/gemini-2.0-flash-lite-preview-02-05:free',
   'meta-llama/llama-3.3-70b-instruct:free',
   'google/gemma-3-27b-it:free',
   'openrouter/auto'
@@ -223,6 +226,7 @@ async function callModel(apiKey, model, messages) {
     body: JSON.stringify({ model, messages, max_tokens: 2048 })
   });
   const data = await res.json();
+  if (res.status === 401) throw new Error('API Key is Invalid or Deleted. Please update MY_API_KEY in script.js.');
   if (!res.ok) throw new Error(data?.error?.message || 'HTTP ' + res.status);
   return data?.choices?.[0]?.message?.content || 'No response received.';
 }
@@ -240,18 +244,35 @@ function stopResponse() {
 async function sendMessage() {
   if (isLoading) return;
   const input = document.getElementById('input');
-  const text = input.value.trim();
-  if (!text) return;
+  let text = input.value.trim();
+  if (!text && attachedFiles.length === 0) return;
 
   const apiKey = MY_API_KEY;
   const model = document.getElementById('model-select').value;
   const modelLabel = document.getElementById('model-select').selectedOptions[0].text;
 
-  addMessage('user', text);
-  history.push({ role: 'user', content: text });
+  let uiText = text;
+  let apiText = text;
+
+  if (attachedFiles.length > 0) {
+    const fileNames = attachedFiles.map(f => f.name).join(', ');
+    uiText = uiText ? `[Attached: ${fileNames}]\n${uiText}` : `[Attached: ${fileNames}]`;
+    const fileContentStr = attachedFiles.map(f => `=== File: ${f.name} ===\n${f.content}\n`).join('\n');
+    apiText = `${fileContentStr}\n\n${text}`;
+  }
+
+  addMessage('user', uiText);
+  history.push({ role: 'user', content: apiText });
+  
   // Use first message as chat title
   if (!currentChatTitle) {
-    currentChatTitle = text.length > 50 ? text.substring(0, 50) + '…' : text;
+    const titleText = text || 'File Context';
+    currentChatTitle = titleText.length > 50 ? titleText.substring(0, 50) + '…' : titleText;
+  }
+
+  if (attachedFiles.length > 0) {
+    attachedFiles = [];
+    renderAttachedFiles();
   }
 
   input.value = '';
@@ -595,3 +616,76 @@ document.addEventListener('click', function (event) {
     prevChats.classList.remove('open');
   }
 });
+
+// ── File Attachments ──
+
+async function extractTextFromPDF(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  if (typeof pdfjsLib === 'undefined') throw new Error("PDF.js not loaded");
+  const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const strings = content.items.map(item => item.str);
+    text += strings.join(' ') + '\n';
+    if (text.length > 500000) break; // Revert to large 500k chars limit
+  }
+  return text;
+}
+
+const fileInput = document.getElementById('file-input');
+if (fileInput) {
+  fileInput.addEventListener('change', async (e) => {
+    const files = e.target.files;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+         showToast(`File ${file.name} is too large (>10MB).`, true);
+         continue;
+      }
+      try {
+        let content = '';
+        if (file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf') {
+          showToast(`Extracting PDF: ${file.name}...`, false, 2000);
+          content = await extractTextFromPDF(file);
+        } else {
+          content = await file.text();
+        }
+        
+        // Remove illegal unicode control characters that commonly break standard API JSON parsers
+        content = content.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F-\x9F]/g, '');
+
+        // Large 500k limit to support large context models
+        if (content.length > 500000) {
+           content = content.substring(0, 500000) + '\n\n...[FILE TRUNCATED DUE TO EXTREME LENGTH LIMITS]';
+           showToast(`File ${file.name} extremely large, truncated.`, false, 3000);
+        }
+
+        attachedFiles.push({ name: file.name, content });
+      } catch (err) {
+        showToast(`Failed to read ${file.name}`, true);
+        console.error(err);
+      }
+    }
+    fileInput.value = ''; // clear
+    renderAttachedFiles();
+  });
+}
+
+function removeFile(index) {
+  attachedFiles.splice(index, 1);
+  renderAttachedFiles();
+}
+
+function renderAttachedFiles() {
+  const container = document.getElementById('attached-files');
+  if (!container) return;
+  container.innerHTML = attachedFiles.map((f, i) => `
+    <div class="file-chip">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+      ${escHtml(f.name)}
+      <button class="remove-file" onclick="removeFile(${i})">&times;</button>
+    </div>
+  `).join('');
+}
