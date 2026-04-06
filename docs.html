@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Klyro Documentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/x-icon" href="artificial-intelligence.svg"/>
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .docs-header {
+    flex-shrink: 0;
+  }
+  .docs-main {
+    display: flex;
+    flex: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 32px 28px;
+    gap: 60px;
+  }
+  .docs-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: sticky;
+    top: 100px;
+    height: max-content;
+  }
+  .docs-sidebar-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    padding-left: 12px;
+  }
+  .docs-sidebar a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .docs-sidebar a:hover, .docs-sidebar a.active {
+    color: var(--text);
+    background: rgba(255,255,255,0.04);
+  }
+  .docs-sidebar a.active {
+    background: rgba(99,102,241,0.1);
+    color: var(--a5);
+  }
+  .docs-content {
+    flex: 1;
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 16px;
+    padding-bottom: 100px;
+  }
+  .docs-content h1 {
+    font-size: 38px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #fff, var(--a3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .docs-content h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-top: 56px;
+    margin-bottom: 20px;
+    color: var(--text);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 14px;
+  }
+  .docs-content h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 32px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  .docs-content p {
+    margin-bottom: 20px;
+    color: rgba(255,255,255,0.75);
+  }
+  .docs-content ul {
+    margin-bottom: 20px;
+    padding-left: 24px;
+    color: rgba(255,255,255,0.75);
+  }
+  .docs-content li {
+    margin-bottom: 10px;
+  }
+  .docs-content li strong {
+    color: var(--text);
+  }
+  .docs-header-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: color 0.2s;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .docs-header-btn:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.08);
+  }
+  .docs-content code {
+    background: rgba(99,102,241,0.15);
+    color: var(--a1);
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85em;
+  }
+  .info-box {
+    background: rgba(99,102,241,0.08);
+    border-left: 3px solid var(--a1);
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 24px;
+    color: rgba(255,255,255,0.85);
+  }
+</style>
+</head>
+<body>
+
+<header class="docs-header" style="justify-content: space-between;">
+   <div class="header-left">
+    <div class="logo">
+    <div class="logo-mark">
+      <img src="artificial-intelligence.svg" alt="Logo">
+    </div>
+    <span class="logo-name" id="logo-name">Klyro</span>
+  </div>
+  </div>
+  
+  <a href="ai-assistant.html" class="docs-header-btn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
+    Return to Chat
+  </a>
+</header>
+
+<div class="docs-main">
+  <aside class="docs-sidebar">
+    <div class="docs-sidebar-title">Documentation</div>
+    <a href="#introduction" class="active">Introduction</a>
+    <a href="#getting-started">Getting Started</a>
+    <a href="#features">Key Features</a>
+    <a href="#privacy">Privacy & Data</a>
+  </aside>
+  
+  <main class="docs-content">
+    <h1 id="introduction">Introduction to Klyro</h1>
+    <p>Welcome to <strong>Klyro</strong>, a highly optimized, local-first, premium AI chat interface. Designed with an "Ethereal Command Center" aesthetic, Klyro serves as a beautiful front-end client for connecting with state-of-the-art open source and commercial AI models.</p>
+    
+    <div class="info-box">
+      <strong>Note:</strong> Klyro is a purely front-end interface. All intelligence is provided by the OpenRouter API.
+    </div>
+
+    <h2 id="getting-started">Getting Started</h2>
+    <p>Using Klyro is designed to be completely frictionless:</p>
+    
+    <h3>Selecting Models</h3>
+    <p>Use the dropdown in the header to effortlessly switch between a variety of free reasoning and instruct models. By default, Klyro uses <code>Auto</code> which selects the best performing free model available at that moment via OpenRouter routing.</p>
+    
+    <h3>Chatting & Formatting</h3>
+    <p>Start typing in the input area at the bottom. Klyro fully supports <strong>Markdown processing</strong>. If you ask Klyro to write code, it will neatly format it into syntax-highlighted blocks that are highly readable thanks to our bundled <code>marked.js</code> processor.</p>
+    
+    <h3>Fast-track Interactions</h3>
+    <p>If you're on a fresh screen without an active chat, you can click any of the gradient "prompt chips" strategically placed in the center of the welcome screen to instantaneously send a contextual query without typing anything.</p>
+
+    <h2 id="features">Key Features</h2>
+    <ul>
+      <li><strong>History Persistence:</strong> All your previous chats are stored seamlessly in your browser. Click the <kbd>Previous Chats</kbd> button on the right edge of the header to view and quickly reload old conversations and context.</li>
+      <li><strong>Title Auto-generation:</strong> Klyro intelligently intercepts your first prompt in any given session, summarizes it into a succinct phrase behind the scenes, and applies it as the saved chat title.</li>
+      <li><strong>Personalization:</strong> Klyro will prompt you for your name upon your initial visit. It remembers this gracefully, applies your initial to your avatar, and updates its welcome dialogue to include your name.</li>
+      <li><strong>Premium Experience:</strong> Complete with glassmorphism overlays, SVG scaling, and high-framerate transitions for a 60fps interaction experience.</li>
+    </ul>
+
+    <h2 id="privacy">Privacy & Data Security</h2>
+    <p>Klyro prioritizes user privacy inherently through its architectural design:</p>
+    <ul>
+      <li><strong>Local Storage:</strong> Your chat history, personalized name, preferences, and cookie consent are saved exclusively within your browser using the <code>localStorage</code> API. Klyro does not transmit an ounce of your personal data to any centralized database.</li>
+      <li><strong>Direct Proxy:</strong> Your AI prompts are securely sent directly to OpenRouter's API endpoints using the local API key configured within the application's core JavaScript. We do not inject telemetry, analytics, or trackers into this process.</li>
+    </ul>
+    
+    <p style="margin-top:60px; font-size: 18px; color: var(--muted); text-align: center;">
+      Built with ❤️ by <a style="color: var(--muted);text-decoration: none;" href="https://ayush-devspace5.web.app">Ayush Devspace</a>.
+    </p>
+  </main>
+</div>
+
+<script>
+  // Simple intersection observer to highlight sidebar links dynamically
+  const sections = document.querySelectorAll('main h2, main h1');
+  const navLinks = document.querySelectorAll('.docs-sidebar a');
+  
+  const observer = new IntersectionObserver((entries) => {
+    let visibleSection = null;
+    entries.forEach(entry => {
+      if (entry.isIntersecting) visibleSection = entry.target;
+    });
+    
+    if (visibleSection) {
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${visibleSection.id}`) {
+          link.classList.add('active');
+        }
+      });
+    }
+  }, { rootMargin: '-10px 0px -70% 0px' });
+  
+  sections.forEach(sec => observer.observe(sec));
+  
+  // Smooth scroll click handler
+  navLinks.forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    });
+  });
+</script>
+</body>
+</html>
