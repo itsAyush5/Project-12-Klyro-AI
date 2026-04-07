@@ -1,4 +1,5 @@
-const MY_API_KEY = "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";
+// API key is loaded from config.js (gitignored) — never hardcode here
+const MY_API_KEY = (window.KLYRO_CONFIG && window.KLYRO_CONFIG.apiKey) || '';
 const AI_NAME = "Klyro"; // Change this variable to rename your AI everywhere
 
 // ─────────────────────────────────────────────────────────────
