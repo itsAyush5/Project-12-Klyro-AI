@@ -1,4 +1,4 @@
-const MY_API_KEY = "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";
+const MY_API_KEY = "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";
 const AI_NAME = "Klyro"; // Change this variable to rename your AI everywhere
 
 // ─────────────────────────────────────────────────────────────
