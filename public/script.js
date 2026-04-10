@@ -1,3 +1,4 @@
+console.log("Klyro SVG v4.0 Loaded");
 // API key is loaded from config.js (gitignored) — never hardcode here
 const MY_API_KEY = (window.KLYRO_CONFIG && window.KLYRO_CONFIG.apiKey) || '';
 const AI_NAME = "Klyro"; // Change this variable to rename your AI everywhere
@@ -124,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function onModelChange() {
   const label = document.getElementById('model-select').selectedOptions[0].text;
-  history = [];
   showToast('Switched to ' + label);
 }
 
@@ -133,17 +133,26 @@ function hideWelcome() {
   if (w) w.remove();
 }
 
-function addMessage(role, text, modelName) {
+function addMessage(role, text, modelName, historyIndex) {
   hideWelcome();
   const chat = document.getElementById('chat');
 
   const row = document.createElement('div');
   row.className = 'message ' + role;
+  const msgIdx = historyIndex !== undefined ? historyIndex : history.length;
+  row.dataset.index = msgIdx;
 
   const av = document.createElement('div');
   av.className = 'av ' + role;
-  const storedName = getUserName();
-  av.textContent = role === 'ai' ? '✦' : (storedName ? storedName.charAt(0).toUpperCase() : '↑');
+  if (role === 'ai') {
+    const img = document.createElement('img');
+    img.src = 'artificial-intelligence.svg';
+    img.alt = AI_NAME;
+    av.appendChild(img);
+  } else {
+    const storedName = getUserName();
+    av.textContent = storedName ? storedName.charAt(0).toUpperCase() : '↑';
+  }
 
   const body = document.createElement('div');
   body.className = 'msg-body';
@@ -160,10 +169,137 @@ function addMessage(role, text, modelName) {
     body.appendChild(tag);
   }
 
+  // ── Actions Toolbar ──
+  const actions = document.createElement('div');
+  actions.className = 'message-actions';
+
+  if (role === 'user') {
+    actions.appendChild(createActionBtn('edit', 'Edit message', () => editMessage(msgIdx, row)));
+  } else {
+    actions.appendChild(createActionBtn('regenerate', 'Regenerate', () => regenerateResponse(msgIdx)));
+    actions.appendChild(createActionBtn('pdf', 'Export to PDF', () => exportToPDF(text, msgIdx)));
+  }
+
+  actions.appendChild(createActionBtn('copy', 'Copy to clipboard', () => copyToClipboard(text)));
+
+  body.appendChild(actions);
   row.appendChild(av);
   row.appendChild(body);
   chat.appendChild(row);
   chat.scrollTop = chat.scrollHeight;
+}
+
+function createActionBtn(type, title, onClick) {
+  const btn = document.createElement('button');
+  btn.className = 'action-btn';
+  btn.title = title;
+  btn.onclick = onClick;
+
+  let iconPath = '';
+  if (type === 'edit') iconPath = 'M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7 M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z';
+  if (type === 'copy') iconPath = 'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M9 2h6v4H9z';
+  if (type === 'regenerate') iconPath = 'M23 4v6h-6 M1 20v-6h6 M3.51 9a9 9 0 0 1 14.85-3.36L23 10 M1 14l4.64 4.36A9 9 0 0 0 20.49 15';
+  if (type === 'pdf') iconPath = 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8';
+
+  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${iconPath}"></path></svg>`;
+  return btn;
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Copied to clipboard! 📋');
+  }).catch(() => {
+    showToast('Failed to copy', true);
+  });
+}
+
+async function exportToPDF(text, index) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    orientation: "p",
+    unit: "mm",
+    format: "a4"
+  });
+  
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 20;
+  const contentWidth = pageWidth - (margin * 2);
+  
+  // ── Claude-style Header ──
+  doc.setFillColor(248, 250, 252); 
+  doc.rect(0, 0, pageWidth, 45, 'F');
+  
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.setTextColor(30, 41, 59); 
+  doc.text("Klyro AI", margin, 20);
+  
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  const dateStr = new Date().toLocaleDateString('en-US', { 
+    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+  });
+  doc.text(`Response Export • ${dateStr}`, margin, 32);
+  
+  doc.setDrawColor(226, 232, 240);
+  doc.setLineWidth(0.5);
+  doc.line(margin, 40, pageWidth - margin, 40);
+  
+  // ── Main Content ──
+  doc.setFontSize(11);
+  doc.setTextColor(51, 65, 85);
+  doc.setFont("helvetica", "normal");
+  
+  // Use a slightly larger line height for better readability
+  const lines = doc.splitTextToSize(text, contentWidth);
+  let y = 55;
+  const lineHeight = 7.5;
+  
+  lines.forEach(line => {
+    if (y + lineHeight > pageHeight - margin) {
+      doc.addPage();
+      y = margin + 10;
+    }
+    doc.text(line, margin, y);
+    y += lineHeight;
+  });
+  
+  // ── Footer ──
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFontSize(9);
+    doc.setTextColor(148, 163, 184);
+    doc.text(`Page ${i} of ${totalPages} • Generated by Klyro AI`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+  }
+  
+  doc.save(`klyro-response-${index}.pdf`);
+  showToast('PDF Exported Successfully! 📄');
+}
+
+function regenerateResponse(index) {
+  if (isLoading) return;
+  
+  const userIdx = index - 1;
+  if (userIdx < 0 || history[userIdx].role !== 'user') {
+    showToast('Could not find original prompt to regenerate.', true);
+    return;
+  }
+
+  // Truncate history to just before the AI response we want to regenerate
+  history = history.slice(0, index);
+  
+  // Clear DOM messages from the AI response onwards
+  const chat = document.getElementById('chat');
+  const rows = Array.from(chat.querySelectorAll('.message'));
+  rows.forEach(row => {
+    if (parseInt(row.dataset.index) >= index) row.remove();
+  });
+
+  // Call processResponse directly without clearing input or adding new user message
+  processResponse();
 }
 
 function formatText(t) {
@@ -183,7 +319,11 @@ function showTyping() {
   const row = document.createElement('div');
   row.className = 'typing-row'; row.id = 'typing-msg';
   const av = document.createElement('div');
-  av.className = 'av ai'; av.textContent = '✦';
+  av.className = 'av ai';
+  const img = document.createElement('img');
+  img.src = 'artificial-intelligence.svg';
+  img.alt = AI_NAME;
+  av.appendChild(img);
   const bub = document.createElement('div');
   bub.className = 'typing-bubble';
   bub.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
@@ -248,8 +388,6 @@ async function sendMessage() {
   let text = input.value.trim();
   if (!text && attachedFiles.length === 0) return;
 
-  const apiKey = MY_API_KEY;
-  const model = document.getElementById('model-select').value;
   const modelLabel = document.getElementById('model-select').selectedOptions[0].text;
 
   let uiText = text;
@@ -265,7 +403,6 @@ async function sendMessage() {
   addMessage('user', uiText);
   history.push({ role: 'user', content: apiText });
   
-  // Use first message as chat title
   if (!currentChatTitle) {
     const titleText = text || 'File Context';
     currentChatTitle = titleText.length > 50 ? titleText.substring(0, 50) + '…' : titleText;
@@ -278,19 +415,35 @@ async function sendMessage() {
 
   input.value = '';
   input.style.height = 'auto';
+  
+  await processResponse(modelLabel);
+}
+
+async function processResponse(modelLabel) {
+  const model = document.getElementById('model-select').value;
+  const apiKey = MY_API_KEY;
+
   isLoading = true;
-  document.getElementById('send-btn').disabled = true;
-  document.getElementById('send-btn').style.display = 'none';
-  document.getElementById('stop-btn').classList.add('show');
+  const sendBtn = document.getElementById('send-btn');
+  const stopBtn = document.getElementById('stop-btn');
+  const input = document.getElementById('input');
+
+  if (sendBtn) {
+    sendBtn.disabled = true;
+    sendBtn.style.display = 'none';
+  }
+  if (stopBtn) stopBtn.classList.add('show');
+  
   showTyping();
 
   try {
     let reply = null;
-    let usedModel = modelLabel;
+    let usedModel = modelLabel || document.getElementById('model-select').selectedOptions[0].text;
 
     try {
       reply = await callModel(apiKey, model, history);
     } catch (e) {
+      if (e.name === 'AbortError') return;
       const isModelError = e.message.toLowerCase().includes('no endpoints') ||
         e.message.toLowerCase().includes('not found') ||
         e.message.toLowerCase().includes('provider') ||
@@ -313,22 +466,119 @@ async function sendMessage() {
 
     history.push({ role: 'assistant', content: reply });
     removeTyping();
-    addMessage('ai', reply, usedModel);
+    addMessage('ai', reply, usedModel, history.length - 1);
     saveCurrentChat();
 
   } catch (err) {
     if (err.name === 'AbortError') return;
     removeTyping();
-    addMessage('ai', err.message);
+    addMessage('ai', err.message, null, history.length);
     showToast(err.message.substring(0, 80), true);
   } finally {
     isLoading = false;
     abortController = null;
-    document.getElementById('send-btn').disabled = false;
-    document.getElementById('send-btn').style.display = 'flex';
-    document.getElementById('stop-btn').classList.remove('show');
-    input.focus();
+    if (sendBtn) {
+      sendBtn.disabled = false;
+      sendBtn.style.display = 'flex';
+    }
+    if (stopBtn) stopBtn.classList.remove('show');
+    if (input) input.focus();
   }
+}
+
+// ── Message Editing Logic ──
+function editMessage(index, row) {
+  if (isLoading) return;
+  const body = row.querySelector('.msg-body');
+  const bub = body.querySelector('.bubble');
+  const originalHtml = bub.innerHTML;
+  
+  // Find raw text from history if possible, else use bubble text
+  // history[index].content might contain file contents
+  let rawText = history[index] ? history[index].content : bub.textContent;
+  
+  // If apiText has file contents, try to extract just the user message
+  if (rawText.includes('=== File:')) {
+    const parts = rawText.split('\n\n');
+    rawText = parts[parts.length - 1]; // last part is the user text
+  }
+
+  body.classList.add('editing');
+  const originalBubbleDisplay = bub.style.display;
+  bub.style.display = 'none';
+  const editBtn = body.querySelector('.action-btn[title="Edit message"]');
+  if (editBtn) editBtn.style.display = 'none';
+  const actionsToolbar = body.querySelector('.message-actions');
+  if (actionsToolbar) actionsToolbar.style.display = 'none';
+
+  const container = document.createElement('div');
+  container.className = 'edit-container';
+  container.innerHTML = `
+    <textarea class="edit-textarea" placeholder="Edit your message…">${escHtml(rawText)}</textarea>
+    <div class="edit-actions">
+      <button class="edit-btn-cancel">Cancel</button>
+      <button class="edit-btn-save">Save & Submit</button>
+    </div>
+  `;
+  body.appendChild(container);
+
+  const textarea = container.querySelector('.edit-textarea');
+  textarea.focus();
+  textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+  autoResize(textarea);
+  textarea.oninput = () => autoResize(textarea);
+
+  container.querySelector('.edit-btn-cancel').onclick = () => {
+    container.remove();
+    bub.style.display = originalBubbleDisplay;
+    if (actionsToolbar) actionsToolbar.style.display = 'flex';
+    body.classList.remove('editing');
+  };
+
+  container.querySelector('.edit-btn-save').onclick = () => {
+    const newText = textarea.value.trim();
+    if (newText && (newText !== rawText)) {
+      commitEdit(index, newText);
+    } else {
+      // Just cancel if no change
+      container.remove();
+      bub.style.display = originalBubbleDisplay;
+      if (actionsToolbar) actionsToolbar.style.display = 'flex';
+      body.classList.remove('editing');
+    }
+  };
+
+  textarea.onkeydown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      container.querySelector('.edit-btn-save').click();
+    }
+    if (e.key === 'Escape') {
+      container.querySelector('.edit-btn-cancel').click();
+    }
+  };
+}
+
+function commitEdit(index, newText) {
+  // 1. Truncate history to the edited message
+  // history is [user0, ai0, user1, ai1, ...]
+  // If we edit user1 (index 2), we keep [user0, ai0] and then send user1-new
+  history = history.slice(0, index);
+  
+  // 2. Clear DOM messages from that point onwards
+  const chat = document.getElementById('chat');
+  const rows = Array.from(chat.querySelectorAll('.message'));
+  rows.forEach(row => {
+    if (parseInt(row.dataset.index) >= index) {
+      row.remove();
+    }
+  });
+
+  // 3. Put new text in input and send
+  const input = document.getElementById('input');
+  input.value = newText;
+  autoResize(input);
+  sendMessage();
 }
 
 function quickSend(t) {
@@ -390,9 +640,9 @@ function loadChat(chatId) {
   // Re-render messages
   const chatEl = document.getElementById('chat');
   chatEl.innerHTML = '';
-  history.forEach(msg => {
-    if (msg.role === 'user') addMessage('user', msg.content);
-    else if (msg.role === 'assistant') addMessage('ai', msg.content, chat.model ? chat.model.split('/').pop().replace(':free', '') : '');
+  history.forEach((msg, idx) => {
+    if (msg.role === 'user') addMessage('user', msg.content, null, idx);
+    else if (msg.role === 'assistant') addMessage('ai', msg.content, chat.model ? chat.model.split('/').pop().replace(':free', '') : '', idx);
   });
 
   document.getElementById('prev-chats').classList.remove('open');

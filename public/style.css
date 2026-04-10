@@ -352,9 +352,16 @@ header {
 }
 
 .av.ai {
-  background: linear-gradient(135deg, var(--a1), var(--a2));
-  box-shadow: 0 0 16px rgba(99,102,241,0.35);
-  font-size: 13px;
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+  padding: 0;
+}
+
+.av.ai img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .av.user {
@@ -363,7 +370,8 @@ header {
   font-size: 13px;
 }
 
-.msg-body { flex: 1; min-width: 0; }
+.msg-body { flex: 1; min-width: 0; display: flex !important; flex-direction: column !important; }
+.message.user .msg-body { align-items: flex-end !important; }
 
 .bubble {
   padding: 13px 18px;
@@ -385,6 +393,119 @@ header {
   border: 1px solid rgba(99,102,241,0.3);
   border-top-right-radius: 4px;
   color: rgba(220,220,255,0.95);
+}
+
+/* ── Message Actions Toolbar ── */
+.message-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  padding: 0 2px;
+}
+
+.message.user .message-actions {
+  justify-content: flex-end;
+}
+
+.message.ai .message-actions {
+  justify-content: flex-start;
+}
+
+.message:hover .message-actions {
+  opacity: 1;
+}
+
+.action-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background: var(--glass2);
+  color: var(--text);
+}
+
+.action-btn svg {
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+
+/* ── Message Editing Interface ── */
+.edit-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.edit-textarea {
+  width: 100%;
+  min-height: 80px;
+  background: rgba(15,15,25,0.95);
+  border: 1px solid rgba(99,102,241,0.4);
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.edit-textarea:focus {
+  border-color: var(--a1);
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.15);
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.edit-btn-save, .edit-btn-cancel {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font);
+}
+
+.edit-btn-save {
+  background: linear-gradient(135deg, var(--a1), var(--a2));
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+}
+
+.edit-btn-save:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(99,102,241,0.45);
+}
+
+.edit-btn-cancel {
+  background: var(--glass2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+}
+
+.edit-btn-save:active, .edit-btn-cancel:active {
+  transform: translateY(0);
 }
 
 .bubble strong { color: rgba(139,92,246,0.95); font-weight: 600; }
