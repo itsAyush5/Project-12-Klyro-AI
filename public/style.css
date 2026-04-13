@@ -30,7 +30,7 @@ body {
   position: relative;
 }
 
-/* ── Aurora Background ── */
+
 .aurora {
   position: fixed;
   inset: 0;
@@ -69,7 +69,6 @@ body {
   100% { transform: translate(30px,20px) scale(1.05); }
 }
 
-/* Noise texture overlay */
 body::after {
   content: '';
   position: fixed;
@@ -80,7 +79,7 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
-/* ── Header ── */
+
 header {
   display: flex;
   align-items: center;
@@ -127,7 +126,7 @@ header {
   width: 32px;
   height: 32px;
   object-fit: cover;
-  border-radius: 8px; /* Or 50% for circle */
+  border-radius: 8px; 
 }
 
 @keyframes spin-slow {
@@ -156,7 +155,7 @@ header {
   letter-spacing: 0.5px;
 }
 
-/* Model selector */
+
 .model-wrap {
   display: flex;
   align-items: center;
@@ -210,7 +209,7 @@ header {
   width: fit-content;
 }
 
-/* ── Chat Area ── */
+
 .chat-wrap {
   flex: 1;
   overflow: hidden;
@@ -236,7 +235,7 @@ header {
   border-radius: 99px;
 }
 
-/* ── Welcome ── */
+
 .welcome {
   display: flex;
   flex-direction: column;
@@ -317,7 +316,7 @@ header {
   box-shadow: 0 4px 20px rgba(99,102,241,0.15);
 }
 
-/* ── Messages ── */
+
 .message {
   display: flex;
   gap: 14px;
@@ -395,7 +394,7 @@ header {
   color: rgba(220,220,255,0.95);
 }
 
-/* ── Message Actions Toolbar ── */
+
 .message-actions {
   display: flex;
   gap: 4px;
@@ -441,7 +440,7 @@ header {
   pointer-events: none;
 }
 
-/* ── Message Editing Interface ── */
+
 .edit-container {
   display: flex;
   flex-direction: column;
@@ -551,7 +550,7 @@ header {
   letter-spacing: 0.3px;
 }
 
-/* Typing indicator */
+
 .typing-row {
   display: flex;
   gap: 14px;
@@ -588,7 +587,7 @@ header {
   40%            { opacity: 1;   transform: scale(1.2); }
 }
 
-/* ── Input Area ── */
+
 .input-area {
   flex-shrink: 0;
   padding: 16px 24px 22px;
@@ -612,7 +611,7 @@ header {
   background: var(--glass2);
   border: 1px solid var(--border2);
   border-radius: 16px;
-  padding: 4px 12px 4px 14px; /* reduced vertical padding */
+  padding: 4px 12px 4px 14px; 
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -631,7 +630,7 @@ header {
   font-weight: 400;
   resize: none;
   outline: none;
-  min-height: 20px; /* was 24px, reduce to 20px */
+  min-height: 20px; 
   max-height: 140px;
   line-height: 1.65;
   padding: 4px 0;
@@ -684,7 +683,7 @@ header {
   letter-spacing: 0.3px;
 }
 
-/* ── Toast ── */
+
 .toast {
   position: fixed;
   bottom: 90px;
@@ -711,7 +710,7 @@ header {
   from { opacity:0; transform: translateY(20px); }
   to   { opacity:1; transform: translateY(0); }
 }
-/* write ui for new chat creation button */
+
 .nwcht {
   background: var(--glass2);
   border: 1px solid var(--border2);
@@ -727,7 +726,7 @@ header {
   background: rgba(255,255,255,0.09);
   border-color: var(--border2);
 }
-/* Write ui for Previous chats*/
+
 .hist {
   background: var(--glass2);
   border: 1px solid var(--border2);
@@ -743,7 +742,7 @@ header {
   background: rgba(255,255,255,0.09);
 }
 
-/* ── Previous Chats Button ── */
+
 #prev-chats-btn {
   font-family: var(--font);
   font-size: 13px;
@@ -763,7 +762,7 @@ header {
   color: #fff;
 }
 
-/* ── Previous Chats Dropdown ── */
+
 #prev-chats {
   position: absolute;
   top: calc(100% + 8px);
@@ -929,7 +928,7 @@ header {
 .rename-confirm:hover { color: var(--a5); background: rgba(16,185,129,0.15); }
 .rename-cancel:hover { color: var(--a4); background: rgba(244,63,94,0.15); }
 
-/* ── Cookie Banner ── */
+
 .cookie-banner {
   position: fixed;
   bottom: 24px;
@@ -988,7 +987,7 @@ header {
   font-size: 13px;
 }
 
-/* ── User Name Chip (header) ── */
+
 .user-chip {
   display: flex;
   align-items: center;
@@ -1031,7 +1030,7 @@ header {
   text-overflow: ellipsis;
 }
 
-/* ── Name Prompt Modal ── */
+
 .name-modal-overlay {
   position: fixed;
   inset: 0;
@@ -1141,7 +1140,7 @@ header {
 }
 .shake { animation: shake 0.4s ease; border-color: rgba(244,63,94,0.6) !important; }
 
-/* ── Web App Docs Nav ── */
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -1168,7 +1167,7 @@ header {
   border-color: rgba(255,255,255,0.1);
 }
 
-/* ── Attach File Styles ── */
+
 .attach-btn {
   background: transparent;
   border: none;
@@ -1219,68 +1218,67 @@ header {
   color: var(--a4);
 }
 
-/* ════════════════════════════════════════════
-   RESPONSIVE — TABLET  (≤ 768px)
-   ════════════════════════════════════════════ */
+
 @media (max-width: 768px) {
 
-  /* ── Header ── */
+  
   header {
-    padding: 0 14px;
+    padding: 10px 14px;
     height: auto;
-    min-height: 56px;
     flex-wrap: wrap;
-    row-gap: 6px;
-    padding-top: 8px;
-    padding-bottom: 8px;
+    row-gap: 12px;
   }
 
   .header-left {
-    gap: 10px;
-    flex: 1;
-    min-width: 0;
+    display: contents; 
+  }
+
+  .logo {
+    order: 1;
+    margin-right: auto;
   }
 
   .header-right {
+    order: 2;
     gap: 8px;
-    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
-  /* Model selector — move to its own row on mobile */
+  
   .model-wrap {
-    order: 10;
+    order: 3;
     width: 100%;
-    padding: 0 0 4px;
-    gap: 6px;
+    padding: 0;
   }
 
   .model-label {
-    display: none; /* hide "Choose Model" label on small screens */
-  }
-
-  .select-outer select {
-    min-width: 0;
-    width: 100%;
-    font-size: 11px;
-    padding: 7px 28px 7px 10px;
+    display: none; 
   }
 
   .select-outer {
     width: 100%;
   }
 
-  /* Logo */
-  .logo-name {
-    font-size: 16px;
+  .select-outer select {
+    min-width: 0;
+    width: 100%;
+    font-size: 13px;
+    padding: 9px 30px 9px 14px;
   }
 
-  /* Header right items */
+  
+  .logo-name {
+    font-size: 18px;
+  }
+
+  
   .header-actions {
     gap: 6px;
   }
 
   .docs-header-link span {
-    display: none; /* icon only on mobile */
+    display: none; 
   }
 
   .docs-header-link {
@@ -1297,13 +1295,13 @@ header {
     padding: 6px 10px;
   }
 
-  /* User chip — shrink name */
+  
   .user-chip-name {
     max-width: 70px;
     font-size: 12px;
   }
 
-  /* ── Previous Chats Dropdown ── */
+  
   #prev-chats {
     right: 0;
     left: 0;
@@ -1314,7 +1312,7 @@ header {
     border-right: none;
   }
 
-  /* ── Chat Area ── */
+  
   .chat-container {
     padding: 16px 12px;
   }
@@ -1327,7 +1325,7 @@ header {
     max-width: 88%;
   }
 
-  /* ── Welcome chips ── */
+  
   .welcome {
     padding: 32px 16px 24px;
   }
@@ -1341,7 +1339,7 @@ header {
     padding: 7px 13px;
   }
 
-  /* ── Input Area ── */
+  
   .input-area {
     padding: 10px 12px 16px;
   }
@@ -1365,7 +1363,7 @@ header {
     height: 36px;
   }
 
-  /* ── Cookie Banner ── */
+  
   .cookie-banner {
     left: 12px;
     right: 12px;
@@ -1373,46 +1371,46 @@ header {
     max-width: none;
   }
 
-  /* ── Toast ── */
+  
   .toast {
     bottom: 80px;
     max-width: 85vw;
   }
 
-  /* ── Name Modal ── */
+  
   .name-modal {
     padding: 32px 24px 28px;
     border-radius: 20px;
   }
 
-  /* ── Typing row ── */
+  
   .typing-row {
     max-width: 100%;
   }
 }
 
-/* ════════════════════════════════════════════
-   RESPONSIVE — MOBILE  (≤ 480px)
-   ════════════════════════════════════════════ */
+
 @media (max-width: 480px) {
 
-  /* Stack header: logo row on top, model row below */
+  
   header {
-    padding: 8px 12px;
+    padding: 8px 10px;
+    row-gap: 8px;
   }
 
-  .header-left {
-    gap: 8px;
+  .header-right {
+    gap: 5px;
+    justify-content: flex-start; 
   }
 
-  /* Keep user chip & prev chats button compact */
+
   .user-chip {
     padding: 4px 8px 4px 4px;
-    gap: 5px;
+    gap: 4px;
   }
 
   .user-chip-name {
-    max-width: 54px;
+    max-width: 48px;
     font-size: 11px;
   }
 
@@ -1433,22 +1431,23 @@ header {
     padding: 5px 8px;
   }
 
-  /* Logo shrink */
+
   .logo-mark, .logo-mark img {
     width: 26px;
     height: 26px;
   }
 
   .logo-name {
-    font-size: 15px;
+    font-size: 16px;
   }
 
-  /* Select box */
+
   .select-outer select {
-    font-size: 10.5px;
+    font-size: 12px;
+    padding: 8px 30px 8px 12px;
   }
 
-  /* Chat messages */
+
   .message.user {
     max-width: 92%;
   }
@@ -1464,7 +1463,7 @@ header {
     border-radius: 8px;
   }
 
-  /* Welcome */
+
   .welcome-title {
     font-size: clamp(22px, 7vw, 32px);
     letter-spacing: -1px;
@@ -1479,7 +1478,7 @@ header {
     padding: 6px 11px;
   }
 
-  /* Input */
+
   .input-hint {
     font-size: 10px;
   }
@@ -1488,12 +1487,12 @@ header {
     font-size: 13px;
   }
 
-  /* Prev chats list */
+
   .prev-chat-list {
     max-height: 260px;
   }
 
-  /* Docs page sidebar hide on mobile */
+ 
   .docs-sidebar {
     display: none;
   }
@@ -1512,11 +1511,9 @@ header {
   }
 }
 
-/* ════════════════════════════════════════════
-   DOCS PAGE RESPONSIVE
-   ════════════════════════════════════════════ */
+
 @media (max-width: 768px) {
-  /* Inline style in docs.html uses fixed width sidebar — override */
+  
   .docs-main {
     flex-direction: column;
     padding: 20px 16px;
