@@ -1282,12 +1282,20 @@ header {
   }
 
   .docs-header-link {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
     padding: 6px 8px;
-    white-space: nowrap;
+    white-space: nowrap !important;
   }
   
   .docs-header-link span {
-    display: inline; /* keep Docs text visible */
+    display: inline-block !important;
+    margin-left: 4px;
+  }
+
+  .docs-header-btn {
+    margin-left: auto !important;
   }
 
   .nwcht {
