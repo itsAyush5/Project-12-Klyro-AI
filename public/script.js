@@ -346,11 +346,10 @@ function showToast(msg, isError = false, d = 3000) {
 }
 
 const FALLBACK_MODELS = [
-  'google/gemini-2.0-pro-exp-02-05:free',
-  'google/gemini-2.0-flash-lite-preview-02-05:free',
+  'openrouter/auto',
   'meta-llama/llama-3.3-70b-instruct:free',
-  'google/gemma-3-27b-it:free',
-  'openrouter/auto'
+  'nousresearch/hermes-3-llama-3.1-405b:free',
+  'google/gemma-3-27b-it:free'
 ];
 
 async function callModel(apiKey, model, messages) {
@@ -444,14 +443,15 @@ async function processResponse(modelLabel) {
       reply = await callModel(apiKey, model, history);
     } catch (e) {
       if (e.name === 'AbortError') return;
-      const isModelError = e.message.toLowerCase().includes('no endpoints') ||
-        e.message.toLowerCase().includes('not found') ||
-        e.message.toLowerCase().includes('provider') ||
-        e.message.includes('404') || e.message.includes('502') || e.message.includes('503');
+      const msg = e.message.toLowerCase();
+      const isModelError = msg.includes('no endpoints') ||
+        msg.includes('not found') ||
+        msg.includes('provider') ||
+        msg.includes('404') || msg.includes('502') || msg.includes('503') || msg.includes('429') || msg.includes('rate limit');
 
       if (!isModelError) throw e;
 
-      showToast('Model offline — trying fallback…', false, 2000);
+      showToast('Model busy/offline — trying fallback…', false, 2000);
       for (const fb of FALLBACK_MODELS) {
         if (fb === model) continue;
         try {
