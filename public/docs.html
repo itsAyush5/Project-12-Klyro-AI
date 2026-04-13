@@ -149,6 +149,52 @@
     margin-bottom: 24px;
     color: rgba(255,255,255,0.85);
   }
+
+  @media (max-width: 768px) {
+    .docs-main {
+      flex-direction: column;
+      padding: 20px 16px;
+      gap: 24px;
+    }
+    .docs-sidebar {
+      width: 100%;
+      position: static;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 6px;
+      row-gap: 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 16px;
+    }
+    .docs-sidebar-title {
+      width: 100%;
+      margin-bottom: 4px;
+      padding-left: 0;
+    }
+    .docs-sidebar a {
+      padding: 6px 12px;
+      font-size: 13px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+    }
+    .docs-content h1 {
+      font-size: clamp(24px, 7vw, 38px);
+    }
+    .docs-content h2 {
+      margin-top: 36px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .docs-sidebar {
+      display: none;
+    }
+    .docs-main {
+      padding: 20px 16px;
+      gap: 0;
+    }
+  }
 </style>
 </head>
 <body>

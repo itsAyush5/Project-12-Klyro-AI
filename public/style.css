@@ -1219,100 +1219,104 @@ header {
 }
 
 
+/* ════════════════════════════════════════════
+   RESPONSIVE — TABLET  (≤ 768px)
+   ════════════════════════════════════════════ */
 @media (max-width: 768px) {
 
-  
+  /* ── Header ── */
   header {
-    padding: 10px 14px;
-    height: auto;
-    flex-wrap: wrap;
-    row-gap: 12px;
+    padding: 0 14px;
+    height: 60px; /* keep fixed height to allow scrolling horizontally */
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  header::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
   }
 
   .header-left {
-    display: contents; 
-  }
-
-  .logo {
-    order: 1;
-    margin-right: auto;
+    gap: 12px;
+    flex: 0 0 auto;
   }
 
   .header-right {
-    order: 2;
     gap: 8px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding-right: 14px; /* padding for scroll stop */
   }
 
-  
+  /* Model selector */
   .model-wrap {
-    order: 3;
-    width: 100%;
+    width: auto;
     padding: 0;
   }
 
   .model-label {
-    display: none; 
+    display: none; /* hide "Choose Model" label on small screens */
   }
 
   .select-outer {
-    width: 100%;
+    width: auto;
   }
 
   .select-outer select {
     min-width: 0;
-    width: 100%;
+    width: 150px;
     font-size: 13px;
-    padding: 9px 30px 9px 14px;
+    padding: 8px 28px 8px 12px;
   }
 
-  
+  /* Logo */
   .logo-name {
-    font-size: 18px;
+    font-size: 17px;
   }
 
-  
+  /* Header right items */
   .header-actions {
-    gap: 6px;
-  }
-
-  .docs-header-link span {
-    display: none; 
+    gap: 8px;
   }
 
   .docs-header-link {
     padding: 6px 8px;
+    white-space: nowrap;
+  }
+  
+  .docs-header-link span {
+    display: inline; /* keep Docs text visible */
   }
 
   .nwcht {
     font-size: 12px;
-    padding: 6px 10px;
+    padding: 6px 12px;
+    white-space: nowrap;
   }
 
   #prev-chats-btn {
     font-size: 12px;
     padding: 6px 10px;
+    white-space: nowrap;
   }
 
-  
+  /* User chip */
   .user-chip-name {
     max-width: 70px;
     font-size: 12px;
   }
 
-  
+  /* ── Previous Chats Dropdown ── */
   #prev-chats {
-    right: 0;
-    left: 0;
-    width: 100%;
-    border-radius: 0 0 14px 14px;
-    top: 100%;
-    border-left: none;
-    border-right: none;
+    right: 14px;
+    width: 300px;
+    position: fixed; /* Keep it fixed relative to viewport since header scrolls */
+    top: 64px;
   }
 
-  
+  /* ── Chat Area ── */
   .chat-container {
     padding: 16px 12px;
   }
@@ -1325,7 +1329,7 @@ header {
     max-width: 88%;
   }
 
-  
+  /* ── Welcome chips ── */
   .welcome {
     padding: 32px 16px 24px;
   }
@@ -1339,7 +1343,7 @@ header {
     padding: 7px 13px;
   }
 
-  
+  /* ── Input Area ── */
   .input-area {
     padding: 10px 12px 16px;
   }
@@ -1363,7 +1367,7 @@ header {
     height: 36px;
   }
 
-  
+  /* ── Cookie Banner ── */
   .cookie-banner {
     left: 12px;
     right: 12px;
@@ -1371,83 +1375,88 @@ header {
     max-width: none;
   }
 
-  
+  /* ── Toast ── */
   .toast {
     bottom: 80px;
     max-width: 85vw;
   }
 
-  
+  /* ── Name Modal ── */
   .name-modal {
     padding: 32px 24px 28px;
     border-radius: 20px;
   }
 
-  
+  /* ── Typing row ── */
   .typing-row {
     max-width: 100%;
   }
 }
 
-
+/* ════════════════════════════════════════════
+   RESPONSIVE — MOBILE  (≤ 480px)
+   ════════════════════════════════════════════ */
 @media (max-width: 480px) {
 
-  
   header {
-    padding: 8px 10px;
-    row-gap: 8px;
+    padding: 0 10px;
+    gap: 12px;
+  }
+
+  .header-left {
+    gap: 8px;
   }
 
   .header-right {
-    gap: 5px;
-    justify-content: flex-start; 
+    gap: 6px;
+    padding-right: 10px;
   }
 
-
+  /* Keep user chip & prev chats button compact */
   .user-chip {
     padding: 4px 8px 4px 4px;
-    gap: 4px;
+    gap: 6px;
   }
 
   .user-chip-name {
-    max-width: 48px;
-    font-size: 11px;
+    max-width: 50px;
+    font-size: 12px;
   }
 
   .user-chip-avatar {
-    width: 22px;
-    height: 22px;
-    font-size: 10px;
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
   }
 
   #prev-chats-btn {
-    font-size: 11px;
-    padding: 5px 8px;
-    white-space: nowrap;
+    font-size: 12px;
+    padding: 6px 10px;
   }
 
   .nwcht {
-    font-size: 11px;
-    padding: 5px 8px;
+    font-size: 12px;
+    padding: 6px 10px;
   }
 
-
+  /* Logo shrink */
   .logo-mark, .logo-mark img {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
   }
 
   .logo-name {
-    font-size: 16px;
+    font-size: 17px;
   }
 
-
+  /* Select box */
   .select-outer select {
     font-size: 12px;
-    padding: 8px 30px 8px 12px;
+    width: 140px;
+    padding: 8px 24px 8px 10px;
   }
 
-
+  /* Chat messages */
   .message.user {
     max-width: 92%;
   }
@@ -1463,7 +1472,7 @@ header {
     border-radius: 8px;
   }
 
-
+  /* Welcome */
   .welcome-title {
     font-size: clamp(22px, 7vw, 32px);
     letter-spacing: -1px;
@@ -1478,7 +1487,7 @@ header {
     padding: 6px 11px;
   }
 
-
+  /* Input */
   .input-hint {
     font-size: 10px;
   }
@@ -1487,12 +1496,12 @@ header {
     font-size: 13px;
   }
 
-
+  /* Prev chats list */
   .prev-chat-list {
     max-height: 260px;
   }
 
- 
+  /* Docs page sidebar hide on mobile */
   .docs-sidebar {
     display: none;
   }
