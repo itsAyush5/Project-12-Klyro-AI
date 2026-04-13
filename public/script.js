@@ -83,7 +83,7 @@ function promptChangeName() {
   const sub = overlay.querySelector('.name-modal-sub');
   const btn = document.getElementById('name-modal-btn');
   title.textContent = 'Change your name';
-  sub.textContent = 'Update how NexAI addresses you.';
+  sub.textContent = 'Update how Klyro addresses you.';
   btn.textContent = 'Save →';
   input.value = getUserName();
   overlay.style.display = 'flex';
