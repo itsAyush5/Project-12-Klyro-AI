@@ -348,8 +348,8 @@ function showToast(msg, isError = false, d = 3000) {
 const FALLBACK_MODELS = [
   'openrouter/auto',
   'meta-llama/llama-3.3-70b-instruct:free',
-  'nousresearch/hermes-3-llama-3.1-405b:free',
-  'google/gemma-3-27b-it:free'
+  'google/gemma-3-27b-it:free',
+  'qwen/qwen3-next-80b-a3b-instruct:free'
 ];
 
 async function callModel(apiKey, model, messages) {
@@ -444,12 +444,10 @@ async function processResponse(modelLabel) {
     } catch (e) {
       if (e.name === 'AbortError') return;
       const msg = e.message.toLowerCase();
-      const isModelError = msg.includes('no endpoints') ||
-        msg.includes('not found') ||
-        msg.includes('provider') ||
-        msg.includes('404') || msg.includes('502') || msg.includes('503') || msg.includes('429') || msg.includes('rate limit');
-
-      if (!isModelError) throw e;
+      if (msg.includes('api key is invalid')) throw e;
+      if (msg.includes('402') || msg.includes('payment') || msg.includes('balance') || msg.includes('credit')) {
+        throw new Error('This premium model requires OpenRouter account credits to use. Please top up your account or select a free model.');
+      }
 
       showToast('Model busy/offline — trying fallback…', false, 2000);
       for (const fb of FALLBACK_MODELS) {
@@ -785,7 +783,7 @@ function createNewChat() {
         </svg>
       </div>
       <div class="welcome-title" id="welcome-title">${getUserName() ? 'Hey ' + getUserName() + ',<br>what can I help<br>you with?' : 'What can I help<br>you with?'}</div>
-      <p class="welcome-sub">Powered by free AI models via OpenRouter. Ask anything — code, ideas, questions.</p>
+      <p class="welcome-sub">Powered by AI models via OpenRouter. Ask anything — code, ideas, questions.</p>
       <div class="chips">
         <div class="chip" onclick='quickSend("Explain quantum computing simply")'>⚛ Quantum computing</div>
         <div class="chip" onclick='quickSend("Write a Python function to reverse a string")'>🐍 Python code</div>

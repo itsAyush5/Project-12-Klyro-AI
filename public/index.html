@@ -1,171 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Klyro</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css?v=5.0">
-<link rel="icon" type="image/x-icon" href="artificial-intelligence.svg"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-</script>
-<meta name="google-site-verification" content="76vpm8bO1Rj0YvoCUKk68O0FuBuEUY-KrwAwNYEreFo" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Klyro</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=5.0">
+  <link rel="icon" type="image/x-icon" href="artificial-intelligence.svg" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  </script>
+  <meta name="google-site-verification" content="76vpm8bO1Rj0YvoCUKk68O0FuBuEUY-KrwAwNYEreFo" />
 </head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-5LD8F7H3HV"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
+  function gtag() { dataLayer.push(arguments); }
   gtag('js', new Date());
 
   gtag('config', 'G-5LD8F7H3HV');
 </script>
+
 <body>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PQ4W8HT5"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-<div class="aurora">
-  <div class="aurora-orb orb1"></div>
-  <div class="aurora-orb orb2"></div>
-  <div class="aurora-orb orb3"></div>
-</div>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PQ4W8HT5" height="0" width="0"
+      style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <div class="aurora">
+    <div class="aurora-orb orb1"></div>
+    <div class="aurora-orb orb2"></div>
+    <div class="aurora-orb orb3"></div>
+  </div>
 
-<header>
-  <div class="header-left">
-    <div class="logo">
-    <div class="logo-mark">
-      <img src="artificial-intelligence.svg" alt="Logo">
+  <header>
+    <div class="header-left">
+      <div class="logo">
+        <div class="logo-mark">
+          <img src="artificial-intelligence.svg" alt="Logo">
+        </div>
+        <span class="logo-name" id="logo-name"><a href="https://klyro-ai-assistant.web.app"
+            style="text-decoration: none;">Klyro</a></span>
+      </div>
+
+      <div class="model-wrap">
+        <div class="select-outer">
+          <select id="model-select" onchange="onModelChange()">
+            <optgroup label="Models">
+              <option value="openrouter/auto">⚡ Auto — Best Available</option>
+              <option value="openai/gpt-4o">GPT-4o</option>
+              <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+              <option value="google/gemini-2.5-pro">Gemini 2.5 Pro</option>
+              <option value="google/gemini-2.5-flash">Gemini 2.5 Flash</option>
+              <option value="anthropic/claude-3.7-sonnet">Claude 3.7 Sonnet</option>
+              <option value="anthropic/claude-opus-4.1">Claude Opus 4</option>
+              <option value="x-ai/grok-4">Grok 4</option>
+              <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B</option>
+              <option value="google/gemma-3-27b-it:free">Gemma 3</option>
+              <option value="qwen/qwen3-next-80b-a3b-instruct:free">Qwen 3 Next</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
     </div>
-    <span class="logo-name" id="logo-name"><a href="https://klyro-ai-assistant.web.app" style="text-decoration: none;">Klyro</a></span>
-  </div>
 
-  <div class="model-wrap">
-    <div class="select-outer">
-      <select id="model-select" onchange="onModelChange()">
-        <optgroup label="Free Models">
-          <option value="openrouter/auto">⚡ Auto — Best Available</option>
-          <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B Instruct</option>
-          <option value="nousresearch/hermes-3-llama-3.1-405b:free">Llama 3.1 Hermes 405B</option>
-          <option value="google/gemma-3-27b-it:free">Google Gemma 3 (27B)</option>
-          <option value="qwen/qwen3-next-80b-a3b-instruct:free">Qwen 3 Next (80B)</option>
-          <option value="nvidia/nemotron-3-super-120b-a12b:free">Nvidia Nemotron 120B</option>
-          <option value="liquid/lfm-2.5-1.2b-thinking:free">Liquid LFM 2.5 (Thinking)</option>
-        </optgroup>
-      </select>
+    <div class="header-right">
+      <div class="header-actions">
+        <a href="docs.html" class="docs-header-link" title="Documentation">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+          </svg>
+          <span>Docs</span>
+        </a>
+        <button id="new-chat-btn" class="nwcht"> + New Chat</button>
+      </div>
+      <!-- User name chip -->
+      <div id="user-chip" class="user-chip" onclick="promptChangeName()" title="Change your name">
+        <span class="user-chip-avatar" id="user-chip-avatar">?</span>
+        <span class="user-chip-name" id="user-chip-name">You</span>
+      </div>
+      <button id="prev-chats-btn">Previous Chats</button>
     </div>
-  </div>
+  </header>
+
+  <div id="prev-chats">
+    <div class="prev-chats-header">
+      <span class="prev-chats-label">Chat History</span>
+    </div>
+    <div class="prev-chats-search">
+      <input id="prev-chat-search-input" type="text" placeholder="Search chats…"
+        oninput="renderPreviousChats(this.value)" autocomplete="off" />
+    </div>
+    <div class="prev-chat-list"></div>
   </div>
 
-  <div class="header-right">
-    <div class="header-actions">
-    <a href="docs.html" class="docs-header-link" title="Documentation">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
-      <span>Docs</span>
-    </a>
-    <button id="new-chat-btn" class="nwcht"> + New Chat</button>
-  </div>
-  <!-- User name chip -->
-  <div id="user-chip" class="user-chip" onclick="promptChangeName()" title="Change your name">
-    <span class="user-chip-avatar" id="user-chip-avatar">?</span>
-    <span class="user-chip-name" id="user-chip-name">You</span>
-  </div>
-  <button id="prev-chats-btn">Previous Chats</button>
-  </div>
-</header>
-
-<div id="prev-chats">
-  <div class="prev-chats-header">
-    <span class="prev-chats-label">Chat History</span>
-  </div>
-  <div class="prev-chats-search">
-    <input id="prev-chat-search-input" type="text" placeholder="Search chats…" oninput="renderPreviousChats(this.value)" autocomplete="off"/>
-  </div>
-  <div class="prev-chat-list"></div>
-</div>
-
-<div class="chat-wrap">
-  <div class="chat-container" id="chat">
-    <div class="welcome" id="welcome">
-      <div class="welcome-title" id="welcome-title">What can I help<br>you with?</div>
-      <p class="welcome-sub">Ask anything — code, ideas, questions.</p>
-      <div class="chips">
-        <div class="chip" onclick="quickSend('Explain quantum computing simply')">⚛ Quantum computing</div>
-        <div class="chip" onclick="quickSend('Write a Python function to reverse a string')">🐍 Python code</div>
-        <div class="chip" onclick="quickSend('Give me 5 tips to learn programming faster')">🚀 Learn faster</div>
-        <div class="chip" onclick="quickSend('What is the difference between AI and ML?')">🤖 AI vs ML</div>
-        <div class="chip" onclick="quickSend('Tell me something fascinating about black holes')">🌌 Black holes</div>
-        <div class="chip" onclick="quickSend('Write a simple HTML page with a button that shows an alert')">💻 HTML example</div>
+  <div class="chat-wrap">
+    <div class="chat-container" id="chat">
+      <div class="welcome" id="welcome">
+        <div class="welcome-title" id="welcome-title">What can I help<br>you with?</div>
+        <p class="welcome-sub">Ask anything — code, ideas, questions.</p>
+        <div class="chips">
+          <div class="chip" onclick="quickSend('Explain quantum computing simply')">⚛ Quantum computing</div>
+          <div class="chip" onclick="quickSend('Write a Python function to reverse a string')">🐍 Python code</div>
+          <div class="chip" onclick="quickSend('Give me 5 tips to learn programming faster')">🚀 Learn faster</div>
+          <div class="chip" onclick="quickSend('What is the difference between AI and ML?')">🤖 AI vs ML</div>
+          <div class="chip" onclick="quickSend('Tell me something fascinating about black holes')">🌌 Black holes</div>
+          <div class="chip" onclick="quickSend('Write a simple HTML page with a button that shows an alert')">💻 HTML
+            example</div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 
-<div class="cookie-banner" id="cookie-banner">
-  <div class="cookie-text">
-    We use cookies and local storage to save your chats and personalise your experience.
-  </div>
-  <button class="cookie-btn" onclick="acceptCookies()">Got it</button>
-</div>
-
-<div class="toast" id="toast"></div>
-
-
-<div class="name-modal-overlay" id="name-modal-overlay">
-  <div class="name-modal" id="name-modal">
-    <div class="name-modal-glyph">
-      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="30" cy="30" r="28" stroke="url(#nmg1)" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.6"/>
-        <circle cx="30" cy="22" r="10" fill="url(#nmg2)" opacity="0.9"/>
-        <path d="M10 50c0-11 9-18 20-18s20 7 20 18" stroke="url(#nmg1)" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
-        <defs>
-          <linearGradient id="nmg1" x1="2" y1="2" x2="58" y2="58" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/>
-          </linearGradient>
-          <linearGradient id="nmg2" x1="20" y1="12" x2="40" y2="32" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#a78bfa"/><stop offset="1" stop-color="#6366f1"/>
-          </linearGradient>
-        </defs>
-      </svg>
+  <div class="cookie-banner" id="cookie-banner">
+    <div class="cookie-text">
+      We use cookies and local storage to save your chats and personalise your experience.
     </div>
-    <h2 class="name-modal-title">What's your name?</h2>
-    <p class="name-modal-sub" id="name-modal-sub">Klyro will use it to personalise your experience.</p>
-    <input id="name-input" class="name-modal-input" type="text" placeholder="Enter your name…" maxlength="32" autocomplete="off"/>
-    <button class="name-modal-btn" id="name-modal-btn" onclick="saveName()">Continue →</button>
+    <button class="cookie-btn" onclick="acceptCookies()">Got it</button>
   </div>
-</div>
 
-<div class="input-area">
-  <div class="input-inner">
-    <div id="attached-files"></div>
-    <div class="input-shell">
-      <input type="file" id="file-input" accept=".txt,.md,.pdf,.csv,.json,.html,.css,.js,.py,.log" style="display: none" />
-      <button class="attach-btn" id="attach-btn" onclick="document.getElementById('file-input').click()" title="Attach File">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+  <div class="toast" id="toast"></div>
+
+
+  <div class="name-modal-overlay" id="name-modal-overlay">
+    <div class="name-modal" id="name-modal">
+      <div class="name-modal-glyph">
+        <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="28" stroke="url(#nmg1)" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.6" />
+          <circle cx="30" cy="22" r="10" fill="url(#nmg2)" opacity="0.9" />
+          <path d="M10 50c0-11 9-18 20-18s20 7 20 18" stroke="url(#nmg1)" stroke-width="2" stroke-linecap="round"
+            opacity="0.8" />
+          <defs>
+            <linearGradient id="nmg1" x1="2" y1="2" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#6366f1" />
+              <stop offset="1" stop-color="#8b5cf6" />
+            </linearGradient>
+            <linearGradient id="nmg2" x1="20" y1="12" x2="40" y2="32" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#a78bfa" />
+              <stop offset="1" stop-color="#6366f1" />
+            </linearGradient>
+          </defs>
         </svg>
-      </button>
-      <textarea class="input-box" id="input" placeholder="Ask anything…" rows="1"
-        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-      <button class="send-btn" id="send-btn" onclick="sendMessage()">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M2 8L14 8M14 8L9 3M14 8L9 13" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <button class="stop-btn" id="stop-btn" onclick="stopResponse()">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <rect x="1" y="1" width="10" height="10" rx="2" fill="#f43f5e"/>
-        </svg>
-      </button>
+      </div>
+      <h2 class="name-modal-title">What's your name?</h2>
+      <p class="name-modal-sub" id="name-modal-sub">Klyro will use it to personalise your experience.</p>
+      <input id="name-input" class="name-modal-input" type="text" placeholder="Enter your name…" maxlength="32"
+        autocomplete="off" />
+      <button class="name-modal-btn" id="name-modal-btn" onclick="saveName()">Continue →</button>
     </div>
-    <div class="input-hint">Klyro can make mistakes.Please Verify the Information.</div>
   </div>
-</div>
-<script src="config.js"></script>
-<script src="script.js?v=5.0"></script>
+
+  <div class="input-area">
+    <div class="input-inner">
+      <div id="attached-files"></div>
+      <div class="input-shell">
+        <input type="file" id="file-input" accept=".txt,.md,.pdf,.csv,.json,.html,.css,.js,.py,.log"
+          style="display: none" />
+        <button class="attach-btn" id="attach-btn" onclick="document.getElementById('file-input').click()"
+          title="Attach File">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
+            </path>
+          </svg>
+        </button>
+        <textarea class="input-box" id="input" placeholder="Ask anything…" rows="1" onkeydown="handleKey(event)"
+          oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M2 8L14 8M14 8L9 3M14 8L9 13" stroke="white" stroke-width="1.8" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button class="stop-btn" id="stop-btn" onclick="stopResponse()">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <rect x="1" y="1" width="10" height="10" rx="2" fill="#f43f5e" />
+          </svg>
+        </button>
+      </div>
+      <div class="input-hint">Klyro can make mistakes.Please Verify the Information.</div>
+    </div>
+  </div>
+  <script src="config.js"></script>
+  <script src="script.js?v=5.0"></script>
 </body>
+
 </html>
