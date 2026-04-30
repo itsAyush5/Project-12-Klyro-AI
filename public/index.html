@@ -12,6 +12,7 @@
   <link rel="icon" type="image/x-icon" href="artificial-intelligence.svg" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
   </script>
@@ -51,18 +52,17 @@
       <div class="model-wrap">
         <div class="select-outer">
           <select id="model-select" onchange="onModelChange()">
-            <optgroup label="Models">
-              <option value="openrouter/auto">⚡ Auto — Best Available</option>
-              <option value="openai/gpt-4o">GPT-4o</option>
-              <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
-              <option value="google/gemini-2.5-pro">Gemini 2.5 Pro</option>
-              <option value="google/gemini-2.5-flash">Gemini 2.5 Flash</option>
-              <option value="anthropic/claude-3.7-sonnet">Claude 3.7 Sonnet</option>
-              <option value="anthropic/claude-opus-4.1">Claude Opus 4</option>
-              <option value="x-ai/grok-4">Grok 4</option>
+            <optgroup label="Free Models">
               <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B</option>
-              <option value="google/gemma-3-27b-it:free">Gemma 3</option>
-              <option value="qwen/qwen3-next-80b-a3b-instruct:free">Qwen 3 Next</option>
+              <option value="google/gemma-4-31b-it:free">Gemma 4 31B</option>
+              <option value="google/gemma-3-27b-it:free">Gemma 3 27B</option>
+              <option value="qwen/qwen3-next-80b-a3b-instruct:free">Qwen 3 Next 80B</option>
+              <option value="qwen/qwen3-coder:free">Qwen 3 Coder</option>
+              <option value="openai/gpt-oss-120b:free">GPT OSS 120B</option>
+              <option value="nvidia/nemotron-3-super-120b-a12b:free">Nemotron 3 120B</option>
+              <option value="nousresearch/hermes-3-llama-3.1-405b:free">Hermes 3 405B</option>
+              <option value="z-ai/glm-4.5-air:free">GLM 4.5 Air</option>
+              <option value="cognitivecomputations/dolphin-mistral-24b-venice-edition:free">Dolphin Mistral</option>
             </optgroup>
           </select>
         </div>

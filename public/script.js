@@ -303,6 +303,9 @@ function regenerateResponse(index) {
 }
 
 function formatText(t) {
+  if (typeof marked !== 'undefined') {
+    return marked.parse(t);
+  }
   t = t.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
     `<pre><code>${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`
   );
@@ -346,10 +349,10 @@ function showToast(msg, isError = false, d = 3000) {
 }
 
 const FALLBACK_MODELS = [
-  'openrouter/auto',
   'meta-llama/llama-3.3-70b-instruct:free',
-  'google/gemma-3-27b-it:free',
-  'qwen/qwen3-next-80b-a3b-instruct:free'
+  'google/gemma-4-31b-it:free',
+  'qwen/qwen3-next-80b-a3b-instruct:free',
+  'openai/gpt-oss-120b:free'
 ];
 
 async function callModel(apiKey, model, messages) {
@@ -449,12 +452,10 @@ async function processResponse(modelLabel) {
         throw new Error('This premium model requires OpenRouter account credits to use. Please top up your account or select a free model.');
       }
 
-      showToast('Model busy/offline — trying fallback…', false, 2000);
       for (const fb of FALLBACK_MODELS) {
         if (fb === model) continue;
         try {
           reply = await callModel(apiKey, fb, history);
-          usedModel = fb.split('/').pop().replace(':free', '') + ' (fallback)';
           break;
         } catch (e2) { continue; }
       }
