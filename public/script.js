@@ -173,20 +173,26 @@ function addMessage(role, text, modelName, historyIndex) {
   const actions = document.createElement('div');
   actions.className = 'message-actions';
 
+  const getText = () => {
+    if (role === 'ai' && history[msgIdx]) return history[msgIdx].content;
+    return text;
+  };
+
   if (role === 'user') {
     actions.appendChild(createActionBtn('edit', 'Edit message', () => editMessage(msgIdx, row)));
   } else {
     actions.appendChild(createActionBtn('regenerate', 'Regenerate', () => regenerateResponse(msgIdx)));
-    actions.appendChild(createActionBtn('pdf', 'Export to PDF', () => exportToPDF(text, msgIdx)));
+    actions.appendChild(createActionBtn('pdf', 'Export to PDF', () => exportToPDF(getText(), msgIdx)));
   }
 
-  actions.appendChild(createActionBtn('copy', 'Copy to clipboard', () => copyToClipboard(text)));
+  actions.appendChild(createActionBtn('copy', 'Copy to clipboard', () => copyToClipboard(getText())));
 
   body.appendChild(actions);
   row.appendChild(av);
   row.appendChild(body);
   chat.appendChild(row);
   chat.scrollTop = chat.scrollHeight;
+  return { row, bub, actions };
 }
 
 function createActionBtn(type, title, onClick) {
@@ -214,69 +220,98 @@ function copyToClipboard(text) {
 }
 
 async function exportToPDF(text, index) {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({
-    orientation: "p",
-    unit: "mm",
-    format: "a4"
-  });
+  if (typeof html2pdf === 'undefined') {
+    showToast('PDF library is still loading. Please try again.', true);
+    return;
+  }
+
+  const container = document.createElement('div');
+  container.style.boxSizing = 'border-box';
+  container.style.padding = '20px';
+  container.style.fontFamily = 'Helvetica, Arial, sans-serif';
+  container.style.color = '#334155';
+  container.style.background = '#ffffff';
+  container.style.width = '800px'; 
   
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 20;
-  const contentWidth = pageWidth - (margin * 2);
+  const header = document.createElement('div');
+  header.style.backgroundColor = '#f8fafc';
+  header.style.padding = '20px';
+  header.style.borderBottom = '1px solid #e2e8f0';
+  header.style.marginBottom = '20px';
   
-  // ── Claude-style Header ──
-  doc.setFillColor(248, 250, 252); 
-  doc.rect(0, 0, pageWidth, 45, 'F');
+  const title = document.createElement('h1');
+  title.textContent = 'Klyro AI';
+  title.style.margin = '0 0 5px 0';
+  title.style.color = '#1e293b';
+  title.style.fontSize = '24px';
   
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.setTextColor(30, 41, 59); 
-  doc.text("Klyro AI", margin, 20);
-  
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(100, 116, 139);
   const dateStr = new Date().toLocaleDateString('en-US', { 
     year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
   });
-  doc.text(`Response Export • ${dateStr}`, margin, 32);
+  const subTitle = document.createElement('div');
+  subTitle.textContent = `Response Export • ${dateStr}`;
+  subTitle.style.color = '#64748b';
+  subTitle.style.fontSize = '12px';
   
-  doc.setDrawColor(226, 232, 240);
-  doc.setLineWidth(0.5);
-  doc.line(margin, 40, pageWidth - margin, 40);
+  header.appendChild(title);
+  header.appendChild(subTitle);
+  container.appendChild(header);
+
+  const content = document.createElement('div');
+  content.style.fontSize = '14px';
+  content.style.lineHeight = '1.6';
   
-  // ── Main Content ──
-  doc.setFontSize(11);
-  doc.setTextColor(51, 65, 85);
-  doc.setFont("helvetica", "normal");
+  content.innerHTML = formatText(text); 
   
-  // Use a slightly larger line height for better readability
-  const lines = doc.splitTextToSize(text, contentWidth);
-  let y = 55;
-  const lineHeight = 7.5;
+  const style = document.createElement('style');
+  style.textContent = `
+    .pdf-content { font-family: 'Inter', Helvetica, Arial, sans-serif; color: #1e293b; }
+    .pdf-content h1, .pdf-content h2, .pdf-content h3, .pdf-content h4 { color: #0f172a; margin-top: 24px; margin-bottom: 12px; font-weight: 600; }
+    .pdf-content table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; page-break-inside: avoid; }
+    .pdf-content tr { page-break-inside: avoid; }
+    .pdf-content th { background: #f8fafc; padding: 12px; border: 1px solid #e2e8f0; text-align: left; font-weight: 600; color: #475569; }
+    .pdf-content td { padding: 12px; border: 1px solid #e2e8f0; vertical-align: top; word-break: break-word; }
+    .pdf-content pre { background: #1e293b; color: #f8fafc; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.5; margin: 16px 0; page-break-inside: avoid; white-space: pre-wrap; word-wrap: break-word; }
+    .pdf-content code { font-family: monospace; background: #f1f5f9; color: #8b5cf6; padding: 3px 6px; border-radius: 4px; font-size: 13px; word-break: break-word; }
+    .pdf-content pre code { background: transparent; color: inherit; padding: 0; white-space: pre-wrap; word-wrap: break-word; }
+    .pdf-content blockquote { border-left: 4px solid #8b5cf6; padding-left: 16px; margin: 16px 0; color: #64748b; font-style: italic; background: #f8fafc; padding: 12px 16px; border-radius: 0 8px 8px 0; page-break-inside: avoid; }
+    .pdf-content p { margin-top: 0; margin-bottom: 16px; line-height: 1.7; }
+    .pdf-content ul, .pdf-content ol { margin-bottom: 16px; padding-left: 24px; }
+    .pdf-content li { margin-bottom: 8px; line-height: 1.6; }
+  `;
+  content.className = 'pdf-content';
+  content.appendChild(style);
   
-  lines.forEach(line => {
-    if (y + lineHeight > pageHeight - margin) {
-      doc.addPage();
-      y = margin + 10;
-    }
-    doc.text(line, margin, y);
-    y += lineHeight;
+  container.appendChild(content);
+
+  const footer = document.createElement('div');
+  footer.style.marginTop = '40px';
+  footer.style.paddingTop = '15px';
+  footer.style.borderTop = '1px solid #e2e8f0';
+  footer.style.textAlign = 'center';
+  footer.style.fontSize = '12px';
+  footer.style.color = '#64748b';
+  footer.innerHTML = 'Made with ❤️ by <a href="https://ayush-devspace5.web.app" style="color: #64748b; text-decoration: none; font-weight: 500;">Ayush Devspace</a>';
+  container.appendChild(footer);
+
+  const safeTitle = currentChatTitle ? currentChatTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase() : 'klyro-chat';
+  
+  const opt = {
+    margin:       [15, 15, 15, 15], 
+    filename:     `${safeTitle}-response-${index}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, logging: false },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  showToast('Generating PDF...', false, 2000);
+  
+  html2pdf().set(opt).from(container).save().then(() => {
+    showToast('PDF Exported Successfully! 📄');
+  }).catch(err => {
+    console.error("PDF Export Error:", err);
+    showToast('PDF Export Failed', true);
   });
-  
-  // ── Footer ──
-  const totalPages = doc.internal.getNumberOfPages();
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i);
-    doc.setFontSize(9);
-    doc.setTextColor(148, 163, 184);
-    doc.text(`Page ${i} of ${totalPages} • Generated by Klyro AI`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-  }
-  
-  doc.save(`klyro-response-${index}.pdf`);
-  showToast('PDF Exported Successfully! 📄');
 }
 
 function regenerateResponse(index) {
@@ -355,7 +390,7 @@ const FALLBACK_MODELS = [
   'openai/gpt-oss-120b:free'
 ];
 
-async function callModel(apiKey, model, messages) {
+async function callModel(apiKey, model, messages, onChunk) {
   abortController = new AbortController();
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -363,15 +398,61 @@ async function callModel(apiKey, model, messages) {
     headers: {
       'Authorization': 'Bearer ' + apiKey,
       'Content-Type': 'application/json',
+      'Accept': 'text/event-stream, application/json',
       'HTTP-Referer': window.location.href,
       'X-Title': AI_NAME
     },
-    body: JSON.stringify({ model, messages, max_tokens: 2048 })
+    body: JSON.stringify({ model, messages, max_tokens: 2048, stream: !!onChunk })
   });
-  const data = await res.json();
+
   if (res.status === 401) throw new Error('API Key is Invalid or Deleted. Please update MY_API_KEY in script.js.');
-  if (!res.ok) throw new Error(data?.error?.message || 'HTTP ' + res.status);
-  return data?.choices?.[0]?.message?.content || 'No response received.';
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData?.error?.message || 'HTTP ' + res.status);
+  }
+
+  const contentType = res.headers.get('content-type') || '';
+  if (!onChunk || contentType.includes('application/json')) {
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || 'API Error');
+    const content = data?.choices?.[0]?.message?.content || data?.choices?.[0]?.delta?.content || 'No response received.';
+    if (onChunk) onChunk(content, content);
+    return content;
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder("utf-8");
+  let reply = '';
+  let buffer = '';
+  
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    
+    let boundary = buffer.indexOf('\n');
+    while (boundary !== -1) {
+      const line = buffer.slice(0, boundary).trim();
+      buffer = buffer.slice(boundary + 1);
+      
+      if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+        let data = null;
+        try {
+          data = JSON.parse(line.substring(6));
+        } catch (e) {}
+        
+        if (data && data.choices && data.choices[0].delta && typeof data.choices[0].delta.content === 'string') {
+          const content = data.choices[0].delta.content;
+          reply += content;
+          if (onChunk) onChunk(content, reply);
+        } else if (data && data.error) {
+          throw new Error(data.error.message || 'API Error during stream');
+        }
+      }
+      boundary = buffer.indexOf('\n');
+    }
+  }
+  return reply || 'No response received.';
 }
 
 function stopResponse() {
@@ -442,8 +523,21 @@ async function processResponse(modelLabel) {
     let reply = null;
     let usedModel = modelLabel || document.getElementById('model-select').selectedOptions[0].text;
 
+    removeTyping();
+    const msgObj = addMessage('ai', '', usedModel, history.length);
+    if (msgObj && msgObj.actions) msgObj.actions.style.display = 'none';
+
+    const onChunk = (chunk, fullText) => {
+      msgObj.bub.innerHTML = formatText(fullText);
+      const chat = document.getElementById('chat');
+      // Scroll if near bottom
+      if (chat.scrollHeight - chat.scrollTop - chat.clientHeight < 120) {
+        chat.scrollTop = chat.scrollHeight;
+      }
+    };
+
     try {
-      reply = await callModel(apiKey, model, history);
+      reply = await callModel(apiKey, model, history, onChunk);
     } catch (e) {
       if (e.name === 'AbortError') return;
       const msg = e.message.toLowerCase();
@@ -455,17 +549,19 @@ async function processResponse(modelLabel) {
       for (const fb of FALLBACK_MODELS) {
         if (fb === model) continue;
         try {
-          reply = await callModel(apiKey, fb, history);
+          reply = await callModel(apiKey, fb, history, onChunk);
           break;
         } catch (e2) { continue; }
       }
     }
 
-    if (!reply) throw new Error('All models failed. Please try again later.');
+    if (!reply) {
+      msgObj.row.remove();
+      throw new Error('All models failed. Please try again later.');
+    }
 
+    if (msgObj && msgObj.actions) msgObj.actions.style.display = 'flex';
     history.push({ role: 'assistant', content: reply });
-    removeTyping();
-    addMessage('ai', reply, usedModel, history.length - 1);
     saveCurrentChat();
 
   } catch (err) {
