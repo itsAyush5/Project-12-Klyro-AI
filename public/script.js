@@ -1,6 +1,6 @@
 console.log("Klyro SVG v4.0 Loaded");
-// API key is loaded from config.js (gitignored) — never hardcode here
-const MY_API_KEY = (window.KLYRO_CONFIG && window.KLYRO_CONFIG.apiKey) || '';
+// API requests are securely proxied through Cloudflare Workers.
+const PROXY_URL = 'https://summer-limit-c821.ayushkunkulol5.workers.dev';
 const AI_NAME = "Klyro"; // Change this variable to rename your AI everywhere
 
 // ─────────────────────────────────────────────────────────────
@@ -11,6 +11,79 @@ let isLoading = false;
 let abortController = null;
 let currentChatId = Date.now().toString();
 let currentChatTitle = null; // will be set from first user message
+let isSearchEnabled = false;
+
+function copyCode(btn) {
+  const codeWrap = btn.closest('.code-wrap');
+  const codeEl = codeWrap.querySelector('code');
+  const text = codeEl.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const original = btn.innerHTML;
+    btn.innerHTML = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = original;
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function clearAllChats() {
+  if (confirm('Delete all chat history? This cannot be undone.')) {
+    localStorage.removeItem('nexai_saved_chats');
+    renderPreviousChats();
+    createNewChat();
+    showToast('Chat history cleared 🗑️');
+  }
+}
+
+function toggleSearch() {
+  isSearchEnabled = !isSearchEnabled;
+  const btn = document.getElementById('search-btn');
+  if (isSearchEnabled) {
+    btn.classList.add('active');
+    showToast('Internal Web Search Enabled 🌐', false, 2000);
+  } else {
+    btn.classList.remove('active');
+    showToast('Web Search Disabled 🌑', false, 2000);
+  }
+}
+
+async function performInternalSearch(query) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+  try {
+    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+    const targetUrl = encodeURIComponent(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`);
+
+    const response = await fetch(proxyUrl + targetUrl, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    const html = await response.text();
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const results = [];
+
+    const entries = doc.querySelectorAll('.result');
+    entries.forEach((entry, i) => {
+      if (i >= 5) return;
+      const title = entry.querySelector('.result__title')?.innerText.trim();
+      const snippet = entry.querySelector('.result__snippet')?.innerText.trim();
+      const link = entry.querySelector('.result__url')?.innerText.trim();
+      if (title && snippet) {
+        results.push(`[Source: ${link}] Title: ${title} - Snippet: ${snippet}`);
+      }
+    });
+
+    return results.length > 0 ? results.join('\n\n') : 'No real-time results found for this query.';
+  } catch (err) {
+    console.error('Search error:', err);
+    clearTimeout(timeoutId);
+    return 'Search service timed out or failed. Proceeding with general knowledge.';
+  }
+}
 
 // ── Name Management ──
 function getUserName() {
@@ -111,6 +184,22 @@ function initName() {
   }
 }
 
+function scrollToBottom() {
+  const chat = document.getElementById('chat');
+  chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
+}
+
+function handleScroll() {
+  const chat = document.getElementById('chat');
+  const btn = document.getElementById('scroll-bottom-btn');
+  if (!chat || !btn) return;
+
+  // Show button if we are more than 300px from bottom
+  const isFar = chat.scrollHeight - chat.scrollTop - chat.clientHeight > 300;
+  if (isFar) btn.classList.add('show');
+  else btn.classList.remove('show');
+}
+
 // Allow Enter key in name input
 document.addEventListener('DOMContentLoaded', () => {
   const nameInput = document.getElementById('name-input');
@@ -119,6 +208,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.key === 'Enter') saveName();
     });
   }
+
+  const chat = document.getElementById('chat');
+  if (chat) chat.addEventListener('scroll', handleScroll, { passive: true });
+
   initName();
   initCookies();
 });
@@ -226,97 +319,110 @@ async function exportToPDF(text, index) {
   }
 
   const container = document.createElement('div');
-  container.style.boxSizing = 'border-box';
-  container.style.padding = '20px';
-  container.style.fontFamily = 'Helvetica, Arial, sans-serif';
-  container.style.color = '#334155';
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.width = '800px';
+  container.style.padding = '40px';
   container.style.background = '#ffffff';
-  container.style.width = '800px'; 
-  
+  container.style.color = '#334155';
+  container.style.fontFamily = 'Helvetica, Arial, sans-serif';
+  container.style.boxSizing = 'border-box';
+
   const header = document.createElement('div');
   header.style.backgroundColor = '#f8fafc';
-  header.style.padding = '20px';
+  header.style.padding = '30px';
   header.style.borderBottom = '1px solid #e2e8f0';
-  header.style.marginBottom = '20px';
-  
+  header.style.marginBottom = '30px';
+  header.style.borderRadius = '8px';
+
   const title = document.createElement('h1');
   title.textContent = 'Klyro AI';
-  title.style.margin = '0 0 5px 0';
+  title.style.margin = '0 0 8px 0';
   title.style.color = '#1e293b';
-  title.style.fontSize = '24px';
-  
-  const dateStr = new Date().toLocaleDateString('en-US', { 
-    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+  title.style.fontSize = '28px';
+
+  const dateStr = new Date().toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
   });
   const subTitle = document.createElement('div');
   subTitle.textContent = `Response Export • ${dateStr}`;
   subTitle.style.color = '#64748b';
-  subTitle.style.fontSize = '12px';
-  
+  subTitle.style.fontSize = '13px';
+
   header.appendChild(title);
   header.appendChild(subTitle);
   container.appendChild(header);
 
   const content = document.createElement('div');
-  content.style.fontSize = '14px';
-  content.style.lineHeight = '1.6';
-  
-  content.innerHTML = formatText(text); 
-  
+  content.style.fontSize = '15px';
+  content.style.lineHeight = '1.7';
+  content.style.color = '#1e293b';
+  content.style.wordBreak = 'break-word';
+
+  content.innerHTML = formatText(text);
+
   const style = document.createElement('style');
   style.textContent = `
-    .pdf-content { font-family: 'Inter', Helvetica, Arial, sans-serif; color: #1e293b; }
-    .pdf-content h1, .pdf-content h2, .pdf-content h3, .pdf-content h4 { color: #0f172a; margin-top: 24px; margin-bottom: 12px; font-weight: 600; }
-    .pdf-content table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; page-break-inside: avoid; }
-    .pdf-content tr { page-break-inside: avoid; }
-    .pdf-content th { background: #f8fafc; padding: 12px; border: 1px solid #e2e8f0; text-align: left; font-weight: 600; color: #475569; }
-    .pdf-content td { padding: 12px; border: 1px solid #e2e8f0; vertical-align: top; word-break: break-word; }
-    .pdf-content pre { background: #1e293b; color: #f8fafc; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.5; margin: 16px 0; page-break-inside: avoid; white-space: pre-wrap; word-wrap: break-word; }
-    .pdf-content code { font-family: monospace; background: #f1f5f9; color: #8b5cf6; padding: 3px 6px; border-radius: 4px; font-size: 13px; word-break: break-word; }
-    .pdf-content pre code { background: transparent; color: inherit; padding: 0; white-space: pre-wrap; word-wrap: break-word; }
-    .pdf-content blockquote { border-left: 4px solid #8b5cf6; padding-left: 16px; margin: 16px 0; color: #64748b; font-style: italic; background: #f8fafc; padding: 12px 16px; border-radius: 0 8px 8px 0; page-break-inside: avoid; }
-    .pdf-content p { margin-top: 0; margin-bottom: 16px; line-height: 1.7; }
-    .pdf-content ul, .pdf-content ol { margin-bottom: 16px; padding-left: 24px; }
-    .pdf-content li { margin-bottom: 8px; line-height: 1.6; }
+    .pdf-content { font-family: 'Helvetica', Arial, sans-serif; }
+    .pdf-content h1, .pdf-content h2, .pdf-content h3 { color: #0f172a; margin-top: 24px; margin-bottom: 12px; font-weight: 600; }
+    .pdf-content table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; table-layout: fixed; }
+    .pdf-content th { background: #f8fafc; padding: 12px; border: 1px solid #e2e8f0; text-align: left; font-weight: 600; }
+    .pdf-content td { padding: 12px; border: 1px solid #e2e8f0; vertical-align: top; word-break: break-word; overflow-wrap: break-word; }
+    .pdf-content pre { background: #1e293b; color: #f8fafc; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.5; margin: 16px 0; white-space: pre-wrap; word-break: break-all; overflow-wrap: break-word; }
+    .pdf-content code { font-family: monospace; background: #f1f5f9; color: #8b5cf6; padding: 2px 5px; border-radius: 4px; font-size: 13px; word-break: break-word; }
+    .pdf-content p { margin-bottom: 16px; }
+    .pdf-content blockquote { border-left: 4px solid #8b5cf6; padding: 12px 20px; margin: 16px 0; background: #f8fafc; color: #475569; font-style: italic; }
+    .pdf-content img { max-width: 100%; height: auto; }
   `;
   content.className = 'pdf-content';
   content.appendChild(style);
-  
+
   container.appendChild(content);
 
   const footer = document.createElement('div');
-  footer.style.marginTop = '40px';
-  footer.style.paddingTop = '15px';
+  footer.style.marginTop = '50px';
+  footer.style.paddingTop = '20px';
   footer.style.borderTop = '1px solid #e2e8f0';
   footer.style.textAlign = 'center';
   footer.style.fontSize = '12px';
-  footer.style.color = '#64748b';
-  footer.innerHTML = 'Made with ❤️ by <a href="https://ayush-devspace5.web.app" style="color: #64748b; text-decoration: none; font-weight: 500;">Ayush Devspace</a>';
+  footer.style.color = '#94a3b8';
+  footer.innerHTML = 'Generated by Klyro AI • <a href="https://klyro-ai-assistant.web.app" style="color: #64748b; text-decoration: none;">klyro-ai-assistant.web.app</a>';
   container.appendChild(footer);
 
+  document.body.appendChild(container);
+
   const safeTitle = currentChatTitle ? currentChatTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase() : 'klyro-chat';
-  
+
   const opt = {
-    margin:       [15, 15, 15, 15], 
-    filename:     `${safeTitle}-response-${index}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, logging: false },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    margin: [15, 15, 15, 15],
+    filename: `${safeTitle}-export.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      width: 800,
+      windowWidth: 800
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
-  showToast('Generating PDF...', false, 2000);
-  
+  showToast('Preparing PDF...', false, 2000);
+
   html2pdf().set(opt).from(container).save().then(() => {
     showToast('PDF Exported Successfully! 📄');
+    document.body.removeChild(container);
   }).catch(err => {
     console.error("PDF Export Error:", err);
     showToast('PDF Export Failed', true);
+    document.body.removeChild(container);
   });
 }
 
 function regenerateResponse(index) {
   if (isLoading) return;
-  
+
   const userIdx = index - 1;
   if (userIdx < 0 || history[userIdx].role !== 'user') {
     showToast('Could not find original prompt to regenerate.', true);
@@ -325,7 +431,7 @@ function regenerateResponse(index) {
 
   // Truncate history to just before the AI response we want to regenerate
   history = history.slice(0, index);
-  
+
   // Clear DOM messages from the AI response onwards
   const chat = document.getElementById('chat');
   const rows = Array.from(chat.querySelectorAll('.message'));
@@ -339,11 +445,35 @@ function regenerateResponse(index) {
 
 function formatText(t) {
   if (typeof marked !== 'undefined') {
-    return marked.parse(t);
+    const renderer = new marked.Renderer();
+    renderer.code = (code, lang) => {
+      const rawCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `<div class="code-wrap">
+        <div class="code-header">
+          <span>${lang || 'code'}</span>
+          <button class="copy-code-btn" onclick="copyCode(this)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Copy
+          </button>
+        </div>
+        <pre><code>${rawCode}</code></pre>
+      </div>`;
+    };
+    return marked.parse(t, { renderer });
   }
-  t = t.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
-    `<pre><code>${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`
-  );
+  t = t.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+    const rawCode = code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<div class="code-wrap">
+      <div class="code-header">
+        <span>${lang || 'code'}</span>
+        <button class="copy-code-btn" onclick="copyCode(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy
+        </button>
+      </div>
+      <pre><code>${rawCode}</code></pre>
+    </div>`;
+  });
   t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
   t = t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   t = t.replace(/\*(.*?)\*/g, '<em>$1</em>');
@@ -385,74 +515,124 @@ function showToast(msg, isError = false, d = 3000) {
 
 const FALLBACK_MODELS = [
   'meta-llama/llama-3.3-70b-instruct:free',
-  'google/gemma-4-31b-it:free',
+  'google/gemma-4-26b-a4b-it:free',
+  'google/gemma-3-27b-it:free',
   'qwen/qwen3-next-80b-a3b-instruct:free',
-  'openai/gpt-oss-120b:free'
+  'qwen/qwen3-coder:free',
+  'nvidia/nemotron-3-super-120b-a12b:free',
+  'openai/gpt-oss-120b:free',
+  'openai/gpt-oss-20b:free',
+  'z-ai/glm-4.5-air:free',
+  'nousresearch/hermes-3-llama-3.1-405b:free',
+  'cognitivecomputations/dolphin-mistral-24b-venice-edition:free'
 ];
 
-async function callModel(apiKey, model, messages, onChunk) {
-  abortController = new AbortController();
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    signal: abortController.signal,
-    headers: {
-      'Authorization': 'Bearer ' + apiKey,
-      'Content-Type': 'application/json',
-      'Accept': 'text/event-stream, application/json',
-      'HTTP-Referer': window.location.href,
-      'X-Title': AI_NAME
-    },
-    body: JSON.stringify({ model, messages, max_tokens: 2048, stream: !!onChunk })
-  });
+async function callModel(model, messages, onChunk) {
+  try {
+    abortController = new AbortController();
 
-  if (res.status === 401) throw new Error('API Key is Invalid or Deleted. Please update MY_API_KEY in script.js.');
-  if (!res.ok) {
-    const errData = await res.json().catch(() => ({}));
-    throw new Error(errData?.error?.message || 'HTTP ' + res.status);
-  }
+    // Create real-time context system message
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-  const contentType = res.headers.get('content-type') || '';
-  if (!onChunk || contentType.includes('application/json')) {
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message || 'API Error');
-    const content = data?.choices?.[0]?.message?.content || data?.choices?.[0]?.delta?.content || 'No response received.';
-    if (onChunk) onChunk(content, content);
-    return content;
-  }
+    const systemMessage = {
+      role: 'system',
+      content: `You are Klyro AI, a sophisticated AI assistant. 
+Today's Date: ${dateStr}. 
+Current Time: ${timeStr}.
+Knowledge Cutoff: Your base knowledge may have a cutoff, but you are aware that today is ${dateStr}. Use this information to provide the most relevant and up-to-date responses possible. If asked about current events beyond your cutoff, acknowledge the current date and provide the best available context.
+Developer: Klyro was built and designed by Ayush Kunkulol, also known as Ayush Devspace. His portfolio is at https://ayush-devspace5.web.app. If anyone asks who created you, who your developer is, or who built Klyro, always credit Ayush Kunkulol as your creator and developer.`
+    };
 
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder("utf-8");
-  let reply = '';
-  let buffer = '';
-  
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    
-    let boundary = buffer.indexOf('\n');
-    while (boundary !== -1) {
-      const line = buffer.slice(0, boundary).trim();
-      buffer = buffer.slice(boundary + 1);
-      
-      if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-        let data = null;
-        try {
-          data = JSON.parse(line.substring(6));
-        } catch (e) {}
-        
-        if (data && data.choices && data.choices[0].delta && typeof data.choices[0].delta.content === 'string') {
-          const content = data.choices[0].delta.content;
-          reply += content;
-          if (onChunk) onChunk(content, reply);
-        } else if (data && data.error) {
-          throw new Error(data.error.message || 'API Error during stream');
-        }
+    // Combine system message with conversation history without mutating the original objects
+    const augmentedMessages = messages.map(m => ({ ...m }));
+    const existingSysIdx = augmentedMessages.findIndex(m => m.role === 'system');
+
+    const isGemma = model.toLowerCase().includes('gemma');
+    const roleName = isGemma ? 'user' : 'system';
+
+    if (existingSysIdx !== -1) {
+      if (isGemma) {
+        augmentedMessages[existingSysIdx].role = 'user';
       }
-      boundary = buffer.indexOf('\n');
+      augmentedMessages[existingSysIdx].content = `${systemMessage.content}\n\n${augmentedMessages[existingSysIdx].content}`;
+    } else {
+      augmentedMessages.unshift({
+        role: roleName,
+        content: systemMessage.content
+      });
     }
+
+    const res = await fetch(PROXY_URL, {
+      method: 'POST',
+      signal: abortController.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream, application/json'
+      },
+      body: JSON.stringify({
+        model,
+        messages: augmentedMessages,
+        max_tokens: 2048,
+        stream: !!onChunk
+      })
+    });
+
+    if (res.status === 401) throw new Error('API Key is Invalid or Deleted in the Cloudflare Proxy.');
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      const errMsg = errData?.error?.message || 'HTTP ' + res.status;
+      window.lastApiError = errMsg;
+      throw new Error(errMsg);
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    if (!onChunk || contentType.includes('application/json')) {
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message || 'API Error');
+      const content = data?.choices?.[0]?.message?.content || data?.choices?.[0]?.delta?.content || 'No response received.';
+      if (onChunk) onChunk(content, content);
+      return content;
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let reply = '';
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      let boundary = buffer.indexOf('\n');
+      while (boundary !== -1) {
+        const line = buffer.slice(0, boundary).trim();
+        buffer = buffer.slice(boundary + 1);
+
+        if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+          let data = null;
+          try {
+            data = JSON.parse(line.substring(6));
+          } catch (e) { }
+
+          if (data && data.choices && data.choices[0].delta && typeof data.choices[0].delta.content === 'string') {
+            const content = data.choices[0].delta.content;
+            reply += content;
+            if (onChunk) onChunk(content, reply);
+          } else if (data && data.error) {
+            throw new Error(data.error.message || 'API Error during stream');
+          }
+        }
+        boundary = buffer.indexOf('\n');
+      }
+    }
+    return reply || 'No response received.';
+  } catch (err) {
+    window.lastApiError = err.message;
+    throw err;
   }
-  return reply || 'No response received.';
 }
 
 function stopResponse() {
@@ -485,7 +665,7 @@ async function sendMessage() {
 
   addMessage('user', uiText);
   history.push({ role: 'user', content: apiText });
-  
+
   if (!currentChatTitle) {
     const titleText = text || 'File Context';
     currentChatTitle = titleText.length > 50 ? titleText.substring(0, 50) + '…' : titleText;
@@ -498,13 +678,15 @@ async function sendMessage() {
 
   input.value = '';
   input.style.height = 'auto';
-  
+
   await processResponse(modelLabel);
 }
 
 async function processResponse(modelLabel) {
   const model = document.getElementById('model-select').value;
-  const apiKey = MY_API_KEY;
+
+
+
 
   isLoading = true;
   const sendBtn = document.getElementById('send-btn');
@@ -516,12 +698,31 @@ async function processResponse(modelLabel) {
     sendBtn.style.display = 'none';
   }
   if (stopBtn) stopBtn.classList.add('show');
-  
+
   showTyping();
 
   try {
     let reply = null;
     let usedModel = modelLabel || document.getElementById('model-select').selectedOptions[0].text;
+
+    // Internal Web Search logic - Built-in native integration
+    let searchContext = null;
+    if (isSearchEnabled) {
+      const lastUserMsg = history.filter(m => m.role === 'user').pop();
+      if (lastUserMsg) {
+        try {
+          showToast('Searching the web...', false, 2000);
+          const searchResults = await performInternalSearch(lastUserMsg.content);
+          searchContext = {
+            role: 'system',
+            content: `[NATIVE KLYRO SEARCH ENABLED]\n\nToday's Date: ${new Date().toLocaleDateString()}\n\nVerified Real-Time Search Results:\n${searchResults}\n\nINSTRUCTION: You are currently augmented with Klyro's internal web search tool. Use the real-time data above to provide an accurate, up-to-date answer. Acknowledge search findings in your response if helpful.`
+          };
+        } catch (searchErr) {
+          console.error('Search failed to inject:', searchErr);
+        }
+      }
+      usedModel += ' (Internal Web Search)';
+    }
 
     removeTyping();
     const msgObj = addMessage('ai', '', usedModel, history.length);
@@ -537,7 +738,8 @@ async function processResponse(modelLabel) {
     };
 
     try {
-      reply = await callModel(apiKey, model, history, onChunk);
+      let messagesToSend = searchContext ? [searchContext, ...history] : history;
+      reply = await callModel(model, messagesToSend, onChunk);
     } catch (e) {
       if (e.name === 'AbortError') return;
       const msg = e.message.toLowerCase();
@@ -549,7 +751,7 @@ async function processResponse(modelLabel) {
       for (const fb of FALLBACK_MODELS) {
         if (fb === model) continue;
         try {
-          reply = await callModel(apiKey, fb, history, onChunk);
+          reply = await callModel(fb, messagesToSend, onChunk);
           break;
         } catch (e2) { continue; }
       }
@@ -557,7 +759,8 @@ async function processResponse(modelLabel) {
 
     if (!reply) {
       msgObj.row.remove();
-      throw new Error('All models failed. Please try again later.');
+      const lastErr = window.lastApiError || 'Unknown Error';
+      throw new Error(`All models failed. Last Error: ${lastErr}`);
     }
 
     if (msgObj && msgObj.actions) msgObj.actions.style.display = 'flex';
@@ -587,11 +790,11 @@ function editMessage(index, row) {
   const body = row.querySelector('.msg-body');
   const bub = body.querySelector('.bubble');
   const originalHtml = bub.innerHTML;
-  
+
   // Find raw text from history if possible, else use bubble text
   // history[index].content might contain file contents
   let rawText = history[index] ? history[index].content : bub.textContent;
-  
+
   // If apiText has file contents, try to extract just the user message
   if (rawText.includes('=== File:')) {
     const parts = rawText.split('\n\n');
@@ -659,7 +862,7 @@ function commitEdit(index, newText) {
   // history is [user0, ai0, user1, ai1, ...]
   // If we edit user1 (index 2), we keep [user0, ai0] and then send user1-new
   history = history.slice(0, index);
-  
+
   // 2. Clear DOM messages from that point onwards
   const chat = document.getElementById('chat');
   const rows = Array.from(chat.querySelectorAll('.message'));
@@ -861,24 +1064,6 @@ function createNewChat() {
   const chatEl = document.getElementById('chat');
   chatEl.innerHTML = `
     <div class="welcome" id="welcome">
-      <div class="welcome-glyph">
-        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="40" cy="40" r="36" stroke="url(#wg1)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/>
-          <circle cx="40" cy="40" r="26" stroke="url(#wg2)" stroke-width="1.5" opacity="0.7"/>
-          <polygon points="40,18 45,34 62,34 48,44 53,60 40,50 27,60 32,44 18,34 35,34" fill="url(#wg3)" opacity="0.9"/>
-          <defs>
-            <linearGradient id="wg1" x1="4" y1="4" x2="76" y2="76" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#6366f1"/><stop offset="1" stop-color="#06b6d4"/>
-            </linearGradient>
-            <linearGradient id="wg2" x1="14" y1="14" x2="66" y2="66" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#8b5cf6"/><stop offset="1" stop-color="#6366f1"/>
-            </linearGradient>
-            <linearGradient id="wg3" x1="18" y1="18" x2="62" y2="62" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#a78bfa"/><stop offset="1" stop-color="#6366f1"/>
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
       <div class="welcome-title" id="welcome-title">${getUserName() ? 'Hey ' + getUserName() + ',<br>what can I help<br>you with?' : 'What can I help<br>you with?'}</div>
       <p class="welcome-sub">Powered by AI models via OpenRouter. Ask anything — code, ideas, questions.</p>
       <div class="chips">
@@ -953,6 +1138,9 @@ function showPreviousChats() {
 }
 
 document.getElementById('prev-chats-btn').addEventListener('click', showPreviousChats);
+document.getElementById('close-history-btn').addEventListener('click', () => {
+  document.getElementById('prev-chats').classList.remove('open');
+});
 
 // Close dropdown when clicking outside
 document.addEventListener('click', function (event) {
@@ -987,8 +1175,8 @@ if (fileInput) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (file.size > 10 * 1024 * 1024) { // 10MB limit
-         showToast(`File ${file.name} is too large (>10MB).`, true);
-         continue;
+        showToast(`File ${file.name} is too large (>10MB).`, true);
+        continue;
       }
       try {
         let content = '';
@@ -998,14 +1186,14 @@ if (fileInput) {
         } else {
           content = await file.text();
         }
-        
+
         // Remove illegal unicode control characters that commonly break standard API JSON parsers
         content = content.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F-\x9F]/g, '');
 
         // Large 500k limit to support large context models
         if (content.length > 500000) {
-           content = content.substring(0, 500000) + '\n\n...[FILE TRUNCATED DUE TO EXTREME LENGTH LIMITS]';
-           showToast(`File ${file.name} extremely large, truncated.`, false, 3000);
+          content = content.substring(0, 500000) + '\n\n...[FILE TRUNCATED DUE TO EXTREME LENGTH LIMITS]';
+          showToast(`File ${file.name} extremely large, truncated.`, false, 3000);
         }
 
         attachedFiles.push({ name: file.name, content });

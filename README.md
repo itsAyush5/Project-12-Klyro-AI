@@ -22,7 +22,13 @@ If you're on a fresh screen without an active chat, you can click any of the gra
 
 ## Key Features
 
+- **Intelligent Fallback System:** Built-in resilience with 10 automatic fallback models to ensure zero downtime when primary models are rate-limited.
+- **Native Web Search:** Built-in capability to browse the web in real-time to answer questions about recent events.
+- **File Attachments:** Upload code files, PDFs, or data locally so your AI can analyze your documents.
+- **PDF Export:** Export any conversation into a beautifully formatted, branded PDF document for record-keeping.
+- **Live Context Awareness:** The AI natively knows the current date and time to provide perfectly contextualized answers.
 - **History Persistence:** All your previous chats are stored seamlessly in your browser. Click the <kbd>Previous Chats</kbd> button on the right edge of the header to view and quickly reload old conversations and context.
+- **Editable Chat History:** Rename or delete past conversations to keep your workspace organized.
 - **Title Auto-generation:** Klyro intelligently intercepts your first prompt in any given session, summarizes it into a succinct phrase behind the scenes, and applies it as the saved chat title.
 - **Personalization:** Klyro will prompt you for your name upon your initial visit. It remembers this gracefully, applies your initial to your avatar, and updates its welcome dialogue to include your name.
 - **Premium Experience:** Complete with glassmorphism overlays, SVG scaling, and high-framerate transitions for a 60fps interaction experience.

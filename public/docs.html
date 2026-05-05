@@ -153,46 +153,51 @@
   @media (max-width: 768px) {
     .docs-main {
       flex-direction: column;
-      padding: 20px 16px;
-      gap: 24px;
+      padding: 24px 16px;
+      gap: 32px;
     }
     .docs-sidebar {
       width: 100%;
-      position: static;
+      position: sticky;
+      top: 60px;
       flex-direction: row;
-      flex-wrap: wrap;
-      gap: 6px;
-      row-gap: 6px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      padding-bottom: 16px;
+      overflow-x: auto;
+      padding: 12px 0;
+      background: var(--bg);
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .docs-sidebar::-webkit-scrollbar {
+      display: none;
     }
     .docs-sidebar-title {
-      width: 100%;
-      margin-bottom: 4px;
-      padding-left: 0;
+      display: none;
     }
     .docs-sidebar a {
-      padding: 6px 12px;
+      white-space: nowrap;
+      padding: 8px 16px;
       font-size: 13px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: var(--glass);
+      border: 1px solid var(--border);
       border-radius: 20px;
     }
     .docs-content h1 {
-      font-size: clamp(24px, 7vw, 38px);
+      font-size: 32px;
     }
     .docs-content h2 {
-      margin-top: 36px;
+      margin-top: 40px;
+      font-size: 22px;
     }
   }
 
   @media (max-width: 480px) {
-    .docs-sidebar {
-      display: none;
-    }
     .docs-main {
-      padding: 20px 16px;
-      gap: 0;
+      padding: 16px;
+    }
+    .docs-content {
+      font-size: 15px;
     }
   }
 </style>
@@ -246,7 +251,13 @@
 
     <h2 id="features">Key Features</h2>
     <ul>
+      <li><strong>Intelligent Fallback System:</strong> Built-in resilience with 10 automatic fallback models to ensure zero downtime when primary models are rate-limited.</li>
+      <li><strong>Native Web Search:</strong> Built-in capability to browse the web in real-time to answer questions about recent events.</li>
+      <li><strong>File Attachments:</strong> Upload code files, PDFs, or data locally so your AI can analyze your documents.</li>
+      <li><strong>PDF Export:</strong> Export any conversation into a beautifully formatted, branded PDF document for record-keeping.</li>
+      <li><strong>Live Context Awareness:</strong> The AI natively knows the current date and time to provide perfectly contextualized answers.</li>
       <li><strong>History Persistence:</strong> All your previous chats are stored seamlessly in your browser. Click the <kbd>Previous Chats</kbd> button on the right edge of the header to view and quickly reload old conversations and context.</li>
+      <li><strong>Editable Chat History:</strong> Rename or delete past conversations to keep your workspace organized.</li>
       <li><strong>Title Auto-generation:</strong> Klyro intelligently intercepts your first prompt in any given session, summarizes it into a succinct phrase behind the scenes, and applies it as the saved chat title.</li>
       <li><strong>Personalization:</strong> Klyro will prompt you for your name upon your initial visit. It remembers this gracefully, applies your initial to your avatar, and updates its welcome dialogue to include your name.</li>
       <li><strong>Premium Experience:</strong> Complete with glassmorphism overlays, SVG scaling, and high-framerate transitions for a 60fps interaction experience.</li>

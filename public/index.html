@@ -4,6 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Klyro AI Assistant" />
+  <meta name="keywords"
+    content="AI, Klyro, AI Assistant, Chatbot, OpenRouter, Gemini, Llama, Qwen, GPT, Claude,Ayush Devspace,Ayush Kunkulol" />
+  <meta name="author" content="Ayush Kunkulol" />
+  <meta name="theme-color" content="#6366f1" />
   <title>Klyro</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap"
@@ -34,11 +39,6 @@
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PQ4W8HT5" height="0" width="0"
       style="display:none;visibility:hidden"></iframe></noscript>
   <!-- End Google Tag Manager (noscript) -->
-  <div class="aurora">
-    <div class="aurora-orb orb1"></div>
-    <div class="aurora-orb orb2"></div>
-    <div class="aurora-orb orb3"></div>
-  </div>
 
   <header>
     <div class="header-left">
@@ -57,8 +57,9 @@
         <div class="select-outer">
           <select id="model-select" onchange="onModelChange()">
             <optgroup label="Free Models">
+              <option value="openrouter/auto">✨ Auto — Best Available</option>
               <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B</option>
-              <option value="google/gemma-4-31b-it:free">Gemma 4 31B</option>
+              <option value="google/gemma-4-26b-a4b-it:free">Gemma 4 26B</option>
               <option value="google/gemma-3-27b-it:free">Gemma 3 27B</option>
               <option value="qwen/qwen3-next-80b-a3b-instruct:free">Qwen 3 Next 80B</option>
               <option value="qwen/qwen3-coder:free">Qwen 3 Coder</option>
@@ -69,6 +70,9 @@
               <option value="cognitivecomputations/dolphin-mistral-24b-venice-edition:free">Dolphin Mistral</option>
             </optgroup>
           </select>
+        </div>
+        <div class="live-context-badge" title="AI is aware of today's date and time">
+          <span class="live-dot"></span> Live
         </div>
       </div>
     </div>
@@ -96,6 +100,7 @@
   <div id="prev-chats">
     <div class="prev-chats-header">
       <span class="prev-chats-label">Chat History</span>
+      <button id="close-history-btn" class="close-history-btn" title="Close History">×</button>
     </div>
     <div class="prev-chats-search">
       <input id="prev-chat-search-input" type="text" placeholder="Search chats…"
@@ -137,10 +142,6 @@
     <div class="name-modal" id="name-modal">
       <div class="name-modal-glyph">
         <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="30" cy="30" r="28" stroke="url(#nmg1)" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.6" />
-          <circle cx="30" cy="22" r="10" fill="url(#nmg2)" opacity="0.9" />
-          <path d="M10 50c0-11 9-18 20-18s20 7 20 18" stroke="url(#nmg1)" stroke-width="2" stroke-linecap="round"
-            opacity="0.8" />
           <defs>
             <linearGradient id="nmg1" x1="2" y1="2" x2="58" y2="58" gradientUnits="userSpaceOnUse">
               <stop stop-color="#6366f1" />
@@ -176,6 +177,14 @@
             </path>
           </svg>
         </button>
+        <button class="search-btn" id="search-btn" onclick="toggleSearch()" title="Search the Web">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+        </button>
         <textarea class="input-box" id="input" placeholder="Ask anything…" rows="1" onkeydown="handleKey(event)"
           oninput="autoResize(this)"></textarea>
         <button class="send-btn" id="send-btn" onclick="sendMessage()">
@@ -193,8 +202,7 @@
       <div class="input-hint">Klyro can make mistakes.Please Verify the Information.</div>
     </div>
   </div>
-  <script src="config.js"></script>
-  <script src="script.js?v=5.0"></script>
+  <script src="script.js?v=6.0"></script>
 </body>
 
 </html>
