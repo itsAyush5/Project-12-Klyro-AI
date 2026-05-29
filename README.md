@@ -1,6 +1,6 @@
 # Introduction to Klyro
 
-Welcome to **Klyro**, a highly optimized, local-first, premium AI chat interface. Designed with an "Ethereal Command Center" aesthetic, Klyro serves as a beautiful front-end client for connecting with state-of-the-art open source and commercial AI models.
+Welcome to **Klyro**, a highly optimized premium AI chat interface. Designed with an "Ethereal Command Center" aesthetic, Klyro serves as a beautiful front-end client for connecting with state-of-the-art open source and commercial AI models.
 
 > **Note:** Klyro is a purely front-end interface. All intelligence is provided by the OpenRouter API.
 
