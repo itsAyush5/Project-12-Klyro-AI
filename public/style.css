@@ -965,6 +965,22 @@ header {
 }
 
 
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 5, 8, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sidebar-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 #prev-chats {
   position: absolute;
   top: 68px;
@@ -1444,6 +1460,11 @@ header {
 
 
 @media (max-width: 768px) {
+  /* Performance optimizations for mobile */
+  body::after, .aurora { display: none; }
+  .welcome-glyph svg, .name-modal-glyph svg { animation: none; filter: none; }
+  .live-dot { animation: none; box-shadow: none; }
+
   header {
     padding: 0 16px;
     height: 64px;
@@ -1491,18 +1512,23 @@ header {
   }
   
   .docs-header-link {
-    padding: 8px;
-    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
   }
   
   .nwcht {
     display: flex;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
+    border-radius: 12px;
   }
   
   .nwcht::before {
@@ -1515,18 +1541,20 @@ header {
   }
 
   .user-chip {
-    padding: 4px;
+    height: 44px;
+    padding: 4px 12px 4px 6px;
+    border-radius: 22px;
   }
 
   #prev-chats-btn {
     font-size: 0;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
+    border-radius: 12px;
   }
   
   #prev-chats-btn::before {
@@ -1551,6 +1579,14 @@ header {
     border-left: 1px solid var(--border);
     margin: 0;
     z-index: 2000;
+    display: flex;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.55);
+  }
+  
+  #prev-chats.open {
+    transform: translateX(0);
   }
 
   .chat-container {
@@ -1568,7 +1604,44 @@ header {
   }
 
   .input-area {
-    padding: 12px 16px 24px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .cookie-banner {
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    left: 16px;
+    right: 16px;
+    max-width: calc(100% - 32px);
+    border-radius: 16px;
+    padding: 16px 20px;
+  }
+
+  .message-actions {
+    opacity: 1 !important;
+    margin-top: 8px;
+    gap: 8px;
+    display: flex !important;
+  }
+
+  .action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--glass2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .action-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .input-box,
+  .prev-chats-search input,
+  .rename-input,
+  .name-modal-input {
+    font-size: 16px !important;
   }
 
   .input-shell {
@@ -1687,7 +1760,7 @@ header {
   }
 
   .input-box {
-    font-size: 13px;
+    font-size: 16px !important;
   }
 
 
@@ -1696,13 +1769,9 @@ header {
   }
 
 
-  .docs-sidebar {
-    display: none;
-  }
-
   .docs-main {
     padding: 20px 16px;
-    gap: 0;
+    gap: 16px;
   }
 
   .docs-content h1 {
@@ -1724,27 +1793,37 @@ header {
   }
 
   .docs-sidebar {
-    width: 100%;
-    position: static;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 6px;
-    row-gap: 6px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 16px;
+    width: calc(100% + 32px) !important;
+    margin-left: -16px !important;
+    position: sticky !important;
+    top: 60px !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 8px 16px 12px 16px !important;
+    background: var(--bg) !important;
+    z-index: 100 !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  .docs-sidebar::-webkit-scrollbar {
+    display: none !important;
   }
 
   .docs-sidebar-title {
-    width: 100%;
-    margin-bottom: 4px;
+    display: none !important;
   }
 
   .docs-sidebar a {
-    padding: 6px 12px;
-    font-size: 13px;
-    background: var(--glass);
-    border: 1px solid var(--border);
-    border-radius: 20px;
+    white-space: nowrap !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    background: var(--glass) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 20px !important;
   }
 
   .docs-content {

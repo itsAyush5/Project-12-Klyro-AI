@@ -189,18 +189,23 @@ function scrollToBottom() {
   chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
 }
 
+let scrollTicking = false;
 function handleScroll() {
-  const chat = document.getElementById('chat');
-  const btn = document.getElementById('scroll-bottom-btn');
-  if (!chat || !btn) return;
-
-  // Show button if we are more than 300px from bottom
-  const isFar = chat.scrollHeight - chat.scrollTop - chat.clientHeight > 300;
-  if (isFar) btn.classList.add('show');
-  else btn.classList.remove('show');
+  if (!scrollTicking) {
+    requestAnimationFrame(() => {
+      const chat = document.getElementById('chat');
+      const btn = document.getElementById('scroll-bottom-btn');
+      if (chat && btn) {
+        const isFar = chat.scrollHeight - chat.scrollTop - chat.clientHeight > 300;
+        if (isFar) btn.classList.add('show');
+        else btn.classList.remove('show');
+      }
+      scrollTicking = false;
+    });
+    scrollTicking = true;
+  }
 }
 
-// Allow Enter key in name input
 document.addEventListener('DOMContentLoaded', () => {
   const nameInput = document.getElementById('name-input');
   if (nameInput) {
@@ -211,6 +216,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const chat = document.getElementById('chat');
   if (chat) chat.addEventListener('scroll', handleScroll, { passive: true });
+
+  // Focus scroll assist for mobile keyboards
+  const mainInput = document.getElementById('input');
+  if (mainInput) {
+    mainInput.addEventListener('focus', () => {
+      setTimeout(scrollToBottom, 150);
+    });
+  }
+
+  // Mobile sidebar overlay close handler
+  const overlay = document.getElementById('sidebar-overlay');
+  if (overlay) {
+    overlay.addEventListener('click', () => {
+      const prevChats = document.getElementById('prev-chats');
+      if (prevChats) prevChats.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+  }
 
   initName();
   initCookies();
@@ -944,6 +967,8 @@ function loadChat(chatId) {
   });
 
   document.getElementById('prev-chats').classList.remove('open');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (overlay) overlay.classList.remove('show');
   showToast('Chat loaded: ' + chat.title.substring(0, 30));
 }
 
@@ -1121,14 +1146,16 @@ function timeAgo(ts) {
   if (h < 24) return h + 'h ago';
   return Math.floor(h / 24) + 'd ago';
 }
-
 function showPreviousChats() {
   const prevChats = document.getElementById('prev-chats');
+  const overlay = document.getElementById('sidebar-overlay');
   const isOpen = prevChats.classList.contains('open');
   if (isOpen) {
     prevChats.classList.remove('open');
+    if (overlay) overlay.classList.remove('show');
   } else {
     prevChats.classList.add('open');
+    if (overlay) overlay.classList.add('show');
     renderPreviousChats('');
     setTimeout(() => {
       const inp = document.getElementById('prev-chat-search-input');
@@ -1140,17 +1167,20 @@ function showPreviousChats() {
 document.getElementById('prev-chats-btn').addEventListener('click', showPreviousChats);
 document.getElementById('close-history-btn').addEventListener('click', () => {
   document.getElementById('prev-chats').classList.remove('open');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (overlay) overlay.classList.remove('show');
 });
 
 // Close dropdown when clicking outside
 document.addEventListener('click', function (event) {
   const prevChats = document.getElementById('prev-chats');
   const prevChatsBtn = document.getElementById('prev-chats-btn');
+  const overlay = document.getElementById('sidebar-overlay');
   if (!prevChats.contains(event.target) && !prevChatsBtn.contains(event.target)) {
     prevChats.classList.remove('open');
+    if (overlay) overlay.classList.remove('show');
   }
 });
-
 // ── File Attachments ──
 
 async function extractTextFromPDF(file) {
