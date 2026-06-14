@@ -120,10 +120,18 @@ function applyName(name) {
   const chip = document.getElementById('user-chip');
   const chipName = document.getElementById('user-chip-name');
   const chipAvatar = document.getElementById('user-chip-avatar');
+  
+  // Update drawer chip
+  const drawerChipName = document.getElementById('user-chip-name-drawer');
+  const drawerChipAvatar = document.getElementById('user-chip-avatar-drawer');
+  
   if (name) {
-    chipName.textContent = name;
-    chipAvatar.textContent = name.charAt(0).toUpperCase();
+    if (chipName) chipName.textContent = name;
+    if (chipAvatar) chipAvatar.textContent = name.charAt(0).toUpperCase();
     if (chip) chip.classList.add('has-name');
+    
+    if (drawerChipName) drawerChipName.textContent = name;
+    if (drawerChipAvatar) drawerChipAvatar.textContent = name.charAt(0).toUpperCase();
   }
   // Update welcome title if visible
   const wt = document.getElementById('welcome-title');
