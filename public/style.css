@@ -1147,7 +1147,7 @@ header {
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(99, 102, 241, 0.08);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  z-index: 300;
+  z-index: 2000;
   overflow: hidden;
   display: none;
   animation: fadeUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
