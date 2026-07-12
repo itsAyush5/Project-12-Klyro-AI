@@ -120,16 +120,16 @@ function applyName(name) {
   const chip = document.getElementById('user-chip');
   const chipName = document.getElementById('user-chip-name');
   const chipAvatar = document.getElementById('user-chip-avatar');
-  
+
   // Update drawer chip
   const drawerChipName = document.getElementById('user-chip-name-drawer');
   const drawerChipAvatar = document.getElementById('user-chip-avatar-drawer');
-  
+
   if (name) {
     if (chipName) chipName.textContent = name;
     if (chipAvatar) chipAvatar.textContent = name.charAt(0).toUpperCase();
     if (chip) chip.classList.add('has-name');
-    
+
     if (drawerChipName) drawerChipName.textContent = name;
     if (drawerChipAvatar) drawerChipAvatar.textContent = name.charAt(0).toUpperCase();
   }
@@ -350,10 +350,9 @@ async function exportToPDF(text, index) {
   }
 
   const container = document.createElement('div');
-  container.style.position = 'fixed';
-  container.style.left = '-9999px';
-  container.style.top = '0';
-  container.style.width = '800px';
+  container.style.width = '100%';
+  container.style.maxWidth = '800px';
+  container.style.margin = '0 auto';
   container.style.padding = '40px';
   container.style.background = '#ffffff';
   container.style.color = '#334155';
@@ -361,16 +360,16 @@ async function exportToPDF(text, index) {
   container.style.boxSizing = 'border-box';
 
   const header = document.createElement('div');
-  header.style.backgroundColor = '#f8fafc';
+  header.style.background = 'linear-gradient(135deg, #6366f1, #8b5cf6)';
   header.style.padding = '30px';
-  header.style.borderBottom = '1px solid #e2e8f0';
   header.style.marginBottom = '30px';
-  header.style.borderRadius = '8px';
+  header.style.borderRadius = '12px';
+  header.style.boxShadow = '0 10px 15px -3px rgba(99, 102, 241, 0.2)';
 
   const title = document.createElement('h1');
   title.textContent = 'Klyro AI';
   title.style.margin = '0 0 8px 0';
-  title.style.color = '#1e293b';
+  title.style.color = '#ffffff';
   title.style.fontSize = '28px';
 
   const dateStr = new Date().toLocaleDateString('en-US', {
@@ -378,7 +377,7 @@ async function exportToPDF(text, index) {
   });
   const subTitle = document.createElement('div');
   subTitle.textContent = `Response Export • ${dateStr}`;
-  subTitle.style.color = '#64748b';
+  subTitle.style.color = 'rgba(255, 255, 255, 0.85)';
   subTitle.style.fontSize = '13px';
 
   header.appendChild(title);
@@ -396,14 +395,16 @@ async function exportToPDF(text, index) {
   const style = document.createElement('style');
   style.textContent = `
     .pdf-content { font-family: 'Helvetica', Arial, sans-serif; }
-    .pdf-content h1, .pdf-content h2, .pdf-content h3 { color: #0f172a; margin-top: 24px; margin-bottom: 12px; font-weight: 600; }
+    .pdf-content h1, .pdf-content h2, .pdf-content h3 { color: #4338ca; margin-top: 24px; margin-bottom: 12px; font-weight: 700; }
     .pdf-content table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; table-layout: fixed; }
-    .pdf-content th { background: #f8fafc; padding: 12px; border: 1px solid #e2e8f0; text-align: left; font-weight: 600; }
-    .pdf-content td { padding: 12px; border: 1px solid #e2e8f0; vertical-align: top; word-break: break-word; overflow-wrap: break-word; }
-    .pdf-content pre { background: #1e293b; color: #f8fafc; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.5; margin: 16px 0; white-space: pre-wrap; word-break: break-all; overflow-wrap: break-word; }
-    .pdf-content code { font-family: monospace; background: #f1f5f9; color: #8b5cf6; padding: 2px 5px; border-radius: 4px; font-size: 13px; word-break: break-word; }
+    .pdf-content th { background: #eef2ff; color: #4f46e5; padding: 12px; border: 1px solid #c7d2fe; text-align: left; font-weight: 600; }
+    .pdf-content td { padding: 12px; border: 1px solid #c7d2fe; vertical-align: top; word-break: break-word; overflow-wrap: break-word; }
+    .pdf-content pre { background: #1e1b4b; color: #f8fafc; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.5; margin: 16px 0; white-space: pre-wrap; word-break: break-all; overflow-wrap: break-word; border: 1px solid #3730a3; border-left: 4px solid #8b5cf6; }
+    .pdf-content code { font-family: monospace; background: #eef2ff; color: #6366f1; padding: 2px 5px; border-radius: 4px; font-size: 13px; word-break: break-word; border: 1px solid #e0e7ff; }
     .pdf-content p { margin-bottom: 16px; }
-    .pdf-content blockquote { border-left: 4px solid #8b5cf6; padding: 12px 20px; margin: 16px 0; background: #f8fafc; color: #475569; font-style: italic; }
+    .pdf-content a { color: #6366f1; text-decoration: none; font-weight: 500; }
+    .pdf-content p, .pdf-content pre, .pdf-content blockquote, .pdf-content table, .pdf-content img, .pdf-content h1, .pdf-content h2, .pdf-content h3 { page-break-inside: avoid; break-inside: avoid; }
+    .pdf-content blockquote { border-left: 4px solid #8b5cf6; padding: 12px 20px; margin: 16px 0; background: #f5f3ff; color: #4338ca; font-style: italic; border-radius: 0 8px 8px 0; }
     .pdf-content img { max-width: 100%; height: auto; }
   `;
   content.className = 'pdf-content';
@@ -418,10 +419,8 @@ async function exportToPDF(text, index) {
   footer.style.textAlign = 'center';
   footer.style.fontSize = '12px';
   footer.style.color = '#94a3b8';
-  footer.innerHTML = 'Generated by Klyro AI • <a href="https://klyro-ai-assistant.web.app" style="color: #64748b; text-decoration: none;">klyro-ai-assistant.web.app</a>';
+  footer.innerHTML = 'Generated by Klyro AI • <a href="https://klyro-ai-assistant.web.app" style="color: #6366f1; text-decoration: none; font-weight: 600;">klyro-ai-assistant.web.app</a>';
   container.appendChild(footer);
-
-  document.body.appendChild(container);
 
   const safeTitle = currentChatTitle ? currentChatTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase() : 'klyro-chat';
 
@@ -432,22 +431,19 @@ async function exportToPDF(text, index) {
     html2canvas: {
       scale: 2,
       useCORS: true,
-      logging: false,
-      width: 800,
-      windowWidth: 800
+      logging: false
     },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
   };
 
   showToast('Preparing PDF...', false, 2000);
 
-  html2pdf().set(opt).from(container).save().then(() => {
+  html2pdf().set(opt).from(container.outerHTML).save().then(() => {
     showToast('PDF Exported Successfully! 📄');
-    document.body.removeChild(container);
   }).catch(err => {
     console.error("PDF Export Error:", err);
     showToast('PDF Export Failed', true);
-    document.body.removeChild(container);
   });
 }
 
@@ -477,8 +473,11 @@ function regenerateResponse(index) {
 function formatText(t) {
   if (typeof marked !== 'undefined') {
     const renderer = new marked.Renderer();
-    renderer.code = (code, lang) => {
-      const rawCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    renderer.code = function (codeObj, langArg) {
+      // Handle both marked v5+ (object) and older versions (string args)
+      const codeText = typeof codeObj === 'string' ? codeObj : (codeObj.text || codeObj.code || '');
+      const lang = typeof codeObj === 'string' ? langArg : (codeObj.lang || '');
+      const rawCode = String(codeText).replace(/</g, '&lt;').replace(/>/g, '&gt;');
       return `<div class="code-wrap">
         <div class="code-header">
           <span>${lang || 'code'}</span>
@@ -545,17 +544,17 @@ function showToast(msg, isError = false, d = 3000) {
 }
 
 const FALLBACK_MODELS = [
-  'meta-llama/llama-3.3-70b-instruct:free',
-  'google/gemma-4-26b-a4b-it:free',
-  'google/gemma-3-27b-it:free',
-  'qwen/qwen3-next-80b-a3b-instruct:free',
-  'qwen/qwen3-coder:free',
-  'nvidia/nemotron-3-super-120b-a12b:free',
-  'openai/gpt-oss-120b:free',
+  'openrouter/free',
+  'nvidia/nemotron-nano-12b-v2-vl:free',
   'openai/gpt-oss-20b:free',
-  'z-ai/glm-4.5-air:free',
-  'nousresearch/hermes-3-llama-3.1-405b:free',
-  'cognitivecomputations/dolphin-mistral-24b-venice-edition:free'
+  'google/gemma-4-26b-a4b-it:free',
+  'nvidia/nemotron-3-nano-30b-a3b:free',
+  'google/gemma-4-31b-it:free',
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'qwen/qwen3-coder:free',
+  'qwen/qwen3-next-80b-a3b-instruct:free',
+  'openai/gpt-oss-120b:free',
+  'nvidia/nemotron-3-super-120b-a12b:free'
 ];
 
 async function callModel(model, messages, onChunk) {
@@ -605,7 +604,7 @@ Developer: Klyro was built and designed by Ayush Kunkulol, also known as Ayush D
       body: JSON.stringify({
         model,
         messages: augmentedMessages,
-        max_tokens: 2048,
+        max_tokens: 1024,
         stream: !!onChunk
       })
     });
@@ -775,9 +774,6 @@ async function processResponse(modelLabel) {
       if (e.name === 'AbortError') return;
       const msg = e.message.toLowerCase();
       if (msg.includes('api key is invalid')) throw e;
-      if (msg.includes('402') || msg.includes('payment') || msg.includes('balance') || msg.includes('credit')) {
-        throw new Error('This premium model requires OpenRouter account credits to use. Please top up your account or select a free model.');
-      }
 
       for (const fb of FALLBACK_MODELS) {
         if (fb === model) continue;

@@ -56,18 +56,22 @@
       <div class="model-wrap">
         <div class="select-outer">
           <select id="model-select" onchange="onModelChange()">
-            <optgroup label="Free Models">
-              <option value="openrouter/auto">✨ Auto — Best Available</option>
+            <optgroup label="⚡ Smart Router">
+              <option value="openrouter/free" selected>🔄 Auto — Best Free</option>
+            </optgroup>
+            <optgroup label="⚡ Fast Models">
+              <option value="nvidia/nemotron-nano-12b-v2-vl:free">Nemotron Nano 12B ⚡</option>
+              <option value="openai/gpt-oss-20b:free">GPT OSS 20B ⚡</option>
+              <option value="google/gemma-4-26b-a4b-it:free">Gemma 4 26B ⚡</option>
+              <option value="nvidia/nemotron-3-nano-30b-a3b:free">Nemotron 3 Nano 30B ⚡</option>
+              <option value="google/gemma-4-31b-it:free">Gemma 4 31B</option>
+            </optgroup>
+            <optgroup label="🧠 Powerful Models">
               <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B</option>
-              <option value="google/gemma-4-26b-a4b-it:free">Gemma 4 26B</option>
-              <option value="google/gemma-3-27b-it:free">Gemma 3 27B</option>
               <option value="qwen/qwen3-next-80b-a3b-instruct:free">Qwen 3 Next 80B</option>
               <option value="qwen/qwen3-coder:free">Qwen 3 Coder</option>
               <option value="openai/gpt-oss-120b:free">GPT OSS 120B</option>
               <option value="nvidia/nemotron-3-super-120b-a12b:free">Nemotron 3 120B</option>
-              <option value="nousresearch/hermes-3-llama-3.1-405b:free">Hermes 3 405B</option>
-              <option value="z-ai/glm-4.5-air:free">GLM 4.5 Air</option>
-              <option value="cognitivecomputations/dolphin-mistral-24b-venice-edition:free">Dolphin Mistral</option>
             </optgroup>
           </select>
         </div>
