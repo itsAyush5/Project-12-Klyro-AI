@@ -1,7 +1,7 @@
 console.log("Klyro SVG v4.0 Loaded");
 
-const PROXY_URL = 'https://klyrosearch.ayushkunkulol5.workers.dev';
-const AI_NAME = "Klyro AI"; 
+const PROXY_URL = 'https://summer-limit-c821.ayushkunkulol5.workers.dev';
+const AI_NAME = "Klyro AI";
 
 // ─────────────────────────────────────────────────────────────
 
@@ -10,7 +10,7 @@ let attachedFiles = [];
 let isLoading = false;
 let abortController = null;
 let currentChatId = Date.now().toString();
-let currentChatTitle = null; 
+let currentChatTitle = null;
 
 function copyCode(btn) {
   const codeWrap = btn.closest('.code-wrap');
