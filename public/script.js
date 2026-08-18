@@ -1,7 +1,7 @@
 console.log("Klyro SVG v4.0 Loaded");
-// API requests are securely proxied through Cloudflare Workers.
-const PROXY_URL = 'https://summer-limit-c821.ayushkunkulol5.workers.dev';
-const AI_NAME = "Klyro AI"; // Change this variable to rename your AI everywhere
+
+const PROXY_URL = 'https://klyrosearch.ayushkunkulol5.workers.dev';
+const AI_NAME = "Klyro AI"; 
 
 // ─────────────────────────────────────────────────────────────
 
@@ -10,7 +10,7 @@ let attachedFiles = [];
 let isLoading = false;
 let abortController = null;
 let currentChatId = Date.now().toString();
-let currentChatTitle = null; // will be set from first user message
+let currentChatTitle = null; 
 
 function copyCode(btn) {
   const codeWrap = btn.closest('.code-wrap');
@@ -43,7 +43,6 @@ async function performInternalSearch(query) {
   const timeoutId = setTimeout(() => controller.abort(), 8000);
 
   try {
-    // Replace this URL with your deployed Cloudflare Worker URL
     const workerUrl = `https://klyrosearch.ayushkunkulol5.workers.dev/?q=${encodeURIComponent(query)}`;
 
     const response = await fetch(workerUrl, { signal: controller.signal });
@@ -72,7 +71,7 @@ async function performInternalSearch(query) {
 }
 
 
-// ── Name Management ──
+
 function getUserName() {
   return localStorage.getItem('nexai_user_name') || '';
 }
@@ -212,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const chat = document.getElementById('chat');
   if (chat) chat.addEventListener('scroll', handleScroll, { passive: true });
 
-  // Focus scroll assist for mobile keyboards
+
   const mainInput = document.getElementById('input');
   if (mainInput) {
     mainInput.addEventListener('focus', () => {
