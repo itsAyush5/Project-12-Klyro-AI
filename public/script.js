@@ -1,7 +1,7 @@
 console.log("Klyro SVG v4.0 Loaded");
 // API requests are securely proxied through Cloudflare Workers.
 const PROXY_URL = 'https://summer-limit-c821.ayushkunkulol5.workers.dev';
-const AI_NAME = "Klyro"; // Change this variable to rename your AI everywhere
+const AI_NAME = "Klyro AI"; // Change this variable to rename your AI everywhere
 
 // ─────────────────────────────────────────────────────────────
 
@@ -11,7 +11,6 @@ let isLoading = false;
 let abortController = null;
 let currentChatId = Date.now().toString();
 let currentChatTitle = null; // will be set from first user message
-let isSearchEnabled = false;
 
 function copyCode(btn) {
   const codeWrap = btn.closest('.code-wrap');
@@ -37,53 +36,41 @@ function clearAllChats() {
   }
 }
 
-function toggleSearch() {
-  isSearchEnabled = !isSearchEnabled;
-  const btn = document.getElementById('search-btn');
-  if (isSearchEnabled) {
-    btn.classList.add('active');
-    showToast('Internal Web Search Enabled 🌐', false, 2000);
-  } else {
-    btn.classList.remove('active');
-    showToast('Web Search Disabled 🌑', false, 2000);
-  }
-}
+
 
 async function performInternalSearch(query) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 6000);
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
 
   try {
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
-    const targetUrl = encodeURIComponent(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`);
+    // Replace this URL with your deployed Cloudflare Worker URL
+    const workerUrl = `https://klyrosearch.ayushkunkulol5.workers.dev/?q=${encodeURIComponent(query)}`;
 
-    const response = await fetch(proxyUrl + targetUrl, { signal: controller.signal });
+    const response = await fetch(workerUrl, { signal: controller.signal });
     clearTimeout(timeoutId);
 
-    const html = await response.text();
+    const data = await response.json();
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
+    if (data.error) {
+      console.error('Google Search API error:', data.error.message);
+      return null;
+    }
+
     const results = [];
+    if (data.items && data.items.length > 0) {
+      data.items.slice(0, 5).forEach(item => {
+        results.push(`[Source: ${item.link}] Title: ${item.title} - Snippet: ${item.snippet}`);
+      });
+    }
 
-    const entries = doc.querySelectorAll('.result');
-    entries.forEach((entry, i) => {
-      if (i >= 5) return;
-      const title = entry.querySelector('.result__title')?.innerText.trim();
-      const snippet = entry.querySelector('.result__snippet')?.innerText.trim();
-      const link = entry.querySelector('.result__url')?.innerText.trim();
-      if (title && snippet) {
-        results.push(`[Source: ${link}] Title: ${title} - Snippet: ${snippet}`);
-      }
-    });
-
-    return results.length > 0 ? results.join('\n\n') : 'No real-time results found for this query.';
+    return results.length > 0 ? results.join('\n\n') : null;
   } catch (err) {
     console.error('Search error:', err);
     clearTimeout(timeoutId);
-    return 'Search service timed out or failed. Proceeding with general knowledge.';
+    return null;
   }
 }
+
 
 // ── Name Management ──
 function getUserName() {
@@ -737,21 +724,21 @@ async function processResponse(modelLabel) {
 
     // Internal Web Search logic - Built-in native integration
     let searchContext = null;
-    if (isSearchEnabled) {
-      const lastUserMsg = history.filter(m => m.role === 'user').pop();
-      if (lastUserMsg) {
-        try {
-          showToast('Searching the web...', false, 2000);
-          const searchResults = await performInternalSearch(lastUserMsg.content);
+    const lastUserMsg = history.filter(m => m.role === 'user').pop();
+    if (lastUserMsg) {
+      try {
+        showToast('Searching the web...', false, 2000);
+        const searchResults = await performInternalSearch(lastUserMsg.content);
+        if (searchResults) {
           searchContext = {
             role: 'system',
-            content: `[NATIVE KLYRO SEARCH ENABLED]\n\nToday's Date: ${new Date().toLocaleDateString()}\n\nVerified Real-Time Search Results:\n${searchResults}\n\nINSTRUCTION: You are currently augmented with Klyro's internal web search tool. Use the real-time data above to provide an accurate, up-to-date answer. Acknowledge search findings in your response if helpful.`
+            content: `[NATIVE KLYRO SEARCH ENABLED]\n\nToday's Date: ${new Date().toLocaleDateString()}\n\nVerified Real-Time Search Results:\n${searchResults}\n\nINSTRUCTION: You are augmented with Klyro's internal web search tool. If the search results are relevant to the user's prompt, use them. If they are irrelevant, ignore them and answer directly.`
           };
-        } catch (searchErr) {
-          console.error('Search failed to inject:', searchErr);
+          usedModel += ' (Web Search)';
         }
+      } catch (searchErr) {
+        console.error('Search failed to inject:', searchErr);
       }
-      usedModel += ' (Internal Web Search)';
     }
 
     removeTyping();
@@ -1208,8 +1195,8 @@ if (fileInput) {
     const files = e.target.files;
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        showToast(`File ${file.name} is too large (>10MB).`, true);
+      if (file.size > 30 * 1024 * 1024) { // 30MB limit
+        showToast(`File ${file.name} is too large (>30MB).`, true);
         continue;
       }
       try {
