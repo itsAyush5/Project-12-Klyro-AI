@@ -1,12 +1,12 @@
 # Introduction to Klyro
 
-Welcome to **Klyro**, a highly optimized premium AI chat interface. Designed with an "Ethereal Command Center" aesthetic, Klyro serves as a beautiful front-end client for connecting with state-of-the-art open source and commercial AI models.
+Welcome to **Klyro AI**, a highly optimized premium AI chat interface. Designed with an "Ethereal Command Center" aesthetic, Klyro serves as a beautiful front-end client for connecting with state-of-the-art open source and commercial AI models.
 
 > **Note:** Klyro is a purely front-end interface. All intelligence is provided by the OpenRouter API.
 
 ## Getting Started
 
-Using Klyro is designed to be completely frictionless:
+Using Klyro AI is designed to be completely frictionless:
 
 ### Selecting Models
 
@@ -32,6 +32,15 @@ If you're on a fresh screen without an active chat, you can click any of the gra
 - **Title Auto-generation:** Klyro intelligently intercepts your first prompt in any given session, summarizes it into a succinct phrase behind the scenes, and applies it as the saved chat title.
 - **Personalization:** Klyro will prompt you for your name upon your initial visit. It remembers this gracefully, applies your initial to your avatar, and updates its welcome dialogue to include your name.
 - **Premium Experience:** Complete with glassmorphism overlays, SVG scaling, and high-framerate transitions for a 60fps interaction experience.
+- **Multimodel Support:** Multiple models support for klyro such as Gemma 4 , Nemetron and Qwen 3, etc.
+
+## Screenshots
+<div>
+<img width="1915" height="894" alt="image" src="https://github.com/user-attachments/assets/9a8cf161-c420-4ce0-8603-94bcdf19b610" />
+   &nbsp;&nbsp;
+<img width="1919" height="898" alt="image" src="https://github.com/user-attachments/assets/a9ef91a9-78ab-48ac-8720-ff091faa318d" />
+</div>
+
 
 ## Privacy & Data Security
 
@@ -43,7 +52,7 @@ Klyro prioritizes user privacy inherently through its architectural design:
 ---
 
 <p align="center" style="margin-top:60px; font-size: 18px;">
-Built with ❤️ by <a style="color: white !important; text-decoration: none !important;"href="https://ayush-devspace5.web.app">Ayush Devspace</a>.
+Built with ❤️ by <a style="color: white !important; text-decoration : "none" !important;"href="https://ayush-devspace5.web.app">Ayush Devspace</a>.
 </p>
 
 - **Note:** It is under development
