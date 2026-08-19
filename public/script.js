@@ -590,7 +590,7 @@ Developer: Klyro was built and designed by Ayush Kunkulol, also known as Ayush D
       body: JSON.stringify({
         model,
         messages: augmentedMessages,
-        max_tokens: 1024,
+        max_tokens: 10000,
         stream: !!onChunk
       })
     });
